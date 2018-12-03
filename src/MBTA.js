@@ -1,33 +1,75 @@
-// import axios from 'axios';
 const axios = require('axios');
+
+// enum TimeUnit {
+//     MS = 'MS';
+//     SECOND = 'SECOND';
+//     MINUTE = 'MINUTE';
+//     HOUR = 'HOUR';
+// }
+
+const convertMs = (ms, units) => {
+    const conversionMap = {
+        MS: 1,
+        SECONDS: 1000,
+        MINUTES: 1000 * 60,
+        HOURS: 1000 * 60 * 60,
+    }
+    return ms / conversionMap[units];
+}
 
 class MBTA {
 
     constructor(apiKey) {
         this.apiKey = apiKey;
         this.queryParams = null;
+        this.prediction = null;
 
-        // mbta.fetch({
+        // mbta.predict({
         //     stopID: 'someID',
         //     directionID: '1',
         //     sort: 'sortOption'
         // });
-
-        // mbta.byDirection(direction_id)
-        //     .byStop(stop)
-        //     .sort(sortOption)
-        //     .fetch();
     }
 
-    fetch(queryParams) {
+    predict(queryParams) {
         const finalQuery = queryParams || this.queryParams;
 
         return axios.get(this._getUrl(finalQuery))
-            .then(res => res && res.data)
+            .then(res => {
+                if (!(res && res.data)) {
+                    throw new Error('No data from MBTA');
+                }
+                this.prediction = res.data;
+                return this.prediction;
+            })
             .catch(err => {
                 console.error('Error fetching MBTA data:', err);
                 throw error;
             });
+    }
+
+    arrivals({ prediction, closestArrivalMs, farthestArrivalMs, limit, timeUnits }) {
+        const finalPrediction = prediction || this.prediction;
+        return this._selectArrivalISOs(finalPrediction)
+            .map(arrivalISO => {
+                if (arrivalISO == null) return 0;
+                const minsUntilArrival = new Date(arrivalISO).valueOf() - Date.now();
+                return minsUntilArrival >= 0 ? minsUntilArrival : 0;
+            })
+            // .filter(msUntilArrival => {
+            //     return msUntilArrival > closestArrivalMs
+            //         && msUntilArrival < farthestArrivalMs;
+            // })
+            .slice(0, limit)
+            .map(arrivalMs => {
+                return Math.floor(convertMs(arrivalMs, timeUnits));
+            });
+    }
+
+    _selectArrivalISOs(prediction) {
+        if (prediction && prediction.data) {
+            return prediction.data.map(vehicle => vehicle.attributes.arrival_time);
+        }
     }
 
     _getUrl(queryParams) {
@@ -65,8 +107,8 @@ class MBTA {
         // TODO: Find out what the filters are
     }
 
-    fetchByStop(stopID) {
-        return this.fetch({ stopID });
+    predictByStop(stopID) {
+        return this.predict({ stopID });
     }
 
     byDirection(directionID) {
