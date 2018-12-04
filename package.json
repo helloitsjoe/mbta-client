@@ -1,0 +1,30 @@
+{
+  "name": "mbta-client",
+  "version": "0.1.0",
+  "description": "MBTA API JavaScript client",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/helloitsjoe/mbta-client.git"
+  },
+  "keywords": [
+    "mbta",
+    "public",
+    "transit",
+    "subway",
+    "bus",
+    "javascript"
+  ],
+  "author": "Joe Boyle",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/helloitsjoe/mbta-client/issues"
+  },
+  "homepage": "https://github.com/helloitsjoe/mbta-client#readme",
+  "dependencies": {
+    "axios": "^0.18.0"
+  }
+}
