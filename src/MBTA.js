@@ -31,7 +31,7 @@ class MBTA {
             });
     }
 
-    arrivals({ prediction, maxArrivals, timeUnits, /* tooCloseMins, tooFarMins, */ }) {
+    arrivals({ prediction, maxArrivals, timeUnits = 'MINUTES', /* tooCloseMins, tooFarMins, */ }) {
         const finalPrediction = prediction || this.prediction;
         return this._selectArrivalISOs(finalPrediction)
             .map(arrivalISO => {
