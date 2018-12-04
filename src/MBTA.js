@@ -1,21 +1,5 @@
 const axios = require('axios');
-
-// enum TimeUnit {
-//     MS = 'MS';
-//     SECOND = 'SECOND';
-//     MINUTE = 'MINUTE';
-//     HOUR = 'HOUR';
-// }
-
-const convertMs = (ms, units) => {
-    const conversionMap = {
-        MS: 1,
-        SECONDS: 1000,
-        MINUTES: 1000 * 60,
-        HOURS: 1000 * 60 * 60,
-    }
-    return ms / conversionMap[units];
-}
+const { convertMs } = require('./utils');
 
 class MBTA {
 
@@ -39,8 +23,7 @@ class MBTA {
                 if (!(res && res.data)) {
                     throw new Error('No data from MBTA');
                 }
-                this.prediction = res.data;
-                return this.prediction;
+                return this.prediction = res.data;
             })
             .catch(err => {
                 console.error('Error fetching MBTA data:', err);
@@ -48,19 +31,19 @@ class MBTA {
             });
     }
 
-    arrivals({ prediction, closestArrivalMs, farthestArrivalMs, limit, timeUnits }) {
+    arrivals({ prediction, maxArrivals, timeUnits, /* tooCloseMins, tooFarMins, */ }) {
         const finalPrediction = prediction || this.prediction;
         return this._selectArrivalISOs(finalPrediction)
             .map(arrivalISO => {
                 if (arrivalISO == null) return 0;
-                const minsUntilArrival = new Date(arrivalISO).valueOf() - Date.now();
-                return minsUntilArrival >= 0 ? minsUntilArrival : 0;
+                const msUntilArrival = new Date(arrivalISO).valueOf() - Date.now();
+                return msUntilArrival >= 0 ? msUntilArrival : 0;
             })
             // .filter(msUntilArrival => {
-            //     return msUntilArrival > closestArrivalMs
-            //         && msUntilArrival < farthestArrivalMs;
+            //     return msUntilArrival > tooClose
+            //         && msUntilArrival < tooFar;
             // })
-            .slice(0, limit)
+            .slice(0, maxArrivals)
             .map(arrivalMs => {
                 return Math.floor(convertMs(arrivalMs, timeUnits));
             });
@@ -103,31 +86,31 @@ class MBTA {
         return `${baseUrl}?${queryString}`;
     }
 
-    filter() {
-        // TODO: Find out what the filters are
-    }
+    // filter() {
+    //     // TODO
+    // }
 
-    predictByStop(stopID) {
-        return this.predict({ stopID });
-    }
+    // predictByStop(stopID) {
+    //     return this.predict({ stopID });
+    // }
 
-    byDirection(directionID) {
-        return this._addParam({ directionID });
-    }
+    // byDirection(directionID) {
+    //     return this._addParam({ directionID });
+    // }
 
-    byStop(stopID) {
-        return this._addParam({ stopID });
-    }
+    // byStop(stopID) {
+    //     return this._addParam({ stopID });
+    // }
 
-    sort(option) {
-        // TODO: enum of options
-        return this._addParam({ sort: option });
-    }
+    // sort(option) {
+    //     // TODO: enum of options
+    //     return this._addParam({ sort: option });
+    // }
 
-    _addParam(paramObj) {
-        this.queryParams = { ...this.queryParams, ...paramObj };
-        return this;
-    }
+    // _addParam(paramObj) {
+    //     this.queryParams = { ...this.queryParams, ...paramObj };
+    //     return this;
+    // }
 }
 
 module.exports = MBTA;
