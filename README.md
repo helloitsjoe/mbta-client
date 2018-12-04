@@ -1,2 +1,2 @@
 # mbta-client
-JavaScript client for the MBTA API
+MBTA API JavaScript client
