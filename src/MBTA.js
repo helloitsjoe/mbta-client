@@ -1,12 +1,16 @@
 const axios = require('axios');
 const { convertMs } = require('./utils');
 
+const BASE_URL = 'https://api-v3.mbta.com';
+const PREDICTIONS = '/predictions';
+const STOPS = '/stops';
+
 class MBTA {
 
     constructor(apiKey) {
         this.apiKey = apiKey;
-        this.queryParams = null;
-        this.prediction = null;
+        this.predictions = [];
+        this.stops = [];
 
         // mbta.predict({
         //     stopID: 'someID',
@@ -15,25 +19,32 @@ class MBTA {
         // });
     }
 
-    predict(queryParams) {
-        const finalQuery = queryParams || this.queryParams;
+    fetchPredictions(queryParams) {
+        const finalQuery = queryParams;
 
-        return axios.get(this._getUrl(finalQuery))
+        return axios.get(this._buildUrl(PREDICTIONS, finalQuery))
             .then(res => {
-                if (!(res && res.data)) {
+                if (!res || !res.data) {
                     throw new Error('No data from MBTA');
                 }
-                return this.prediction = res.data;
+                return this.predictions = res.data;
             })
             .catch(err => {
-                console.error('Error fetching MBTA data:', err);
-                throw error;
+                const { response } = err;
+                if (response && response.data && response.data.errors) {
+                    const [error] = response.data.errors;
+                    console.error(`Error ${error.status} fetching MBTA data: ${error.detail}`);
+                } else {
+                    console.error('Error fetching MBTA data:', err.message);
+                }
+                throw err;
             });
     }
 
-    arrivals({ prediction, maxArrivals, timeUnits = 'MINUTES', /* tooCloseMins, tooFarMins, */ }) {
-        const finalPrediction = prediction || this.prediction;
-        return this._selectArrivalISOs(finalPrediction)
+    arrivals({ predictions, maxArrivals, timeUnits = 'MINUTES', /* tooCloseMins, tooFarMins, */ }) {
+        const finalPredictions = predictions || this.predictions;
+        
+        return this._selectArrivalISOs(finalPredictions)
             .map(arrivalISO => {
                 if (arrivalISO == null) return 0;
                 const msUntilArrival = new Date(arrivalISO).valueOf() - Date.now();
@@ -49,17 +60,20 @@ class MBTA {
             });
     }
 
-    _selectArrivalISOs(prediction) {
-        if (prediction && prediction.data) {
-            return prediction.data.map(vehicle => vehicle.attributes.arrival_time);
+    _selectArrivalISOs(predictions) {
+        if (!predictions || !predictions.data) {
+            console.warn('No prediction data...');
+            return [];
         }
+
+        return predictions.data.map(vehicle => vehicle.attributes.arrival_time);
     }
 
-    _getUrl(queryParams) {
-        const baseUrl = `https://api-v3.mbta.com/predictions`;
+    _buildUrl(endpoint, queryParams) {
+        const url = BASE_URL + endpoint;
 
-        if (!(queryParams && Object.keys(queryParams).length)) {
-            return baseUrl;
+        if (!queryParams || !Object.keys(queryParams).length) {
+            return url;
         }
 
         const keyAdapter = {
@@ -83,34 +97,13 @@ class MBTA {
             .filter(Boolean)
             .join('&');
 
-        return `${baseUrl}?${queryString}`;
+        if (this.apiKey == null) {
+            console.warn('API key is missing. Keys available at https://api-v3.mbta.com');
+            return `${url}?${queryString}`;
+        }
+
+        return `${url}?${queryString}&api_key=${this.apiKey}`;
     }
-
-    // filter() {
-    //     // TODO
-    // }
-
-    // predictByStop(stopID) {
-    //     return this.predict({ stopID });
-    // }
-
-    // byDirection(directionID) {
-    //     return this._addParam({ directionID });
-    // }
-
-    // byStop(stopID) {
-    //     return this._addParam({ stopID });
-    // }
-
-    // sort(option) {
-    //     // TODO: enum of options
-    //     return this._addParam({ sort: option });
-    // }
-
-    // _addParam(paramObj) {
-    //     this.queryParams = { ...this.queryParams, ...paramObj };
-    //     return this;
-    // }
 }
 
 module.exports = MBTA;
