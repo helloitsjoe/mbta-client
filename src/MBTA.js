@@ -51,10 +51,18 @@ class MBTA {
             });
     }
 
-    arrivals({ predictions, max, units, now = Date.now() }) {
+    arrivals({ predictions, max, units, now }) {
+        return this._convertTimes(selectArrivalISOs, { predictions, max, units, now })
+    }
+
+    departures({ predictions, max, units, now }) {
+        return this._convertTimes(selectDepartureISOs, { predictions, max, units, now })
+    }
+
+    _convertTimes(selector, { predictions, max, units, now = Date.now() }) {
         const finalPredictions = predictions || this.predictions;
 
-        return selectArrivalISOs(finalPredictions)
+        return selector(finalPredictions)
             .slice(0, max)
             .map(arrivalISO => {
                 // arrivalISO could be null if first stop on a route. Use departures if it's not null
@@ -65,23 +73,6 @@ class MBTA {
                 const unitsUntilArrival = Math.floor(convertMs(arrivalInMs, units));
 
                 return unitsUntilArrival >= 0 ? unitsUntilArrival : 0;
-            });
-    }
-
-    departures({ predictions, max, units, now = Date.now() }) {
-        const finalPredictions = predictions || this.predictions;
-        
-        return selectDepartureISOs(finalPredictions)
-            .slice(0, max)
-            .map(departISO => {
-                // departureISO could be null if final stop on a route
-                // See https://www.mbta.com/developers/v3-api/best-practices for more info
-                if (units == null || departISO == null) return departISO;
-
-                const departureInMs = new Date(departISO).valueOf() - now;
-                const unitsUntilDepart = Math.floor(convertMs(departureInMs, units));
-
-                return unitsUntilDepart > 0 ? unitsUntilDepart : 0;
             });
     }
 
