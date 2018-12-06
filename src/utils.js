@@ -12,6 +12,8 @@ const Attributes = {
 }
 
 const convertMs = (ms, units) => {
+    if (units == null) return ms;
+
     const conversionMap = {
         MS: 1,
         SECONDS: 1000,

@@ -1,4 +1,4 @@
-const predictions = { data:
+const predictionData = { data:
     [ { attributes:
          { arrival_time: null,
            departure_time: '2018-12-05T20:21:55-05:00',
@@ -27,7 +27,7 @@ const predictions = { data:
         type: 'prediction' },
       { attributes:
          { arrival_time: '2018-12-05T20:28:42-05:00',
-           departure_time: '2018-12-05T20:28:42-05:00',
+           departure_time: '2018-12-05T20:28:43-05:00',
            direction_id: 0,
            schedule_relationship: null,
            status: null,
@@ -40,7 +40,7 @@ const predictions = { data:
         type: 'prediction' },
       { attributes:
          { arrival_time: '2018-12-05T20:36:53-05:00',
-           departure_time: '2018-12-05T20:36:53-05:00',
+           departure_time: '2018-12-05T20:36:54-05:00',
            direction_id: 0,
            schedule_relationship: null,
            status: null,
@@ -53,7 +53,7 @@ const predictions = { data:
         type: 'prediction' },
       { attributes:
          { arrival_time: '2018-12-05T20:47:49-05:00',
-           departure_time: '2018-12-05T20:47:49-05:00',
+           departure_time: '2018-12-05T20:47:50-05:00',
            direction_id: 0,
            schedule_relationship: null,
            status: null,
@@ -66,7 +66,7 @@ const predictions = { data:
         type: 'prediction' },
       { attributes:
          { arrival_time: '2018-12-05T20:58:49-05:00',
-           departure_time: '2018-12-05T20:58:49-05:00',
+           departure_time: '2018-12-05T20:58:50-05:00',
            direction_id: 0,
            schedule_relationship: null,
            status: null,
@@ -79,7 +79,7 @@ const predictions = { data:
         type: 'prediction' },
       { attributes:
          { arrival_time: '2018-12-05T21:10:49-05:00',
-           departure_time: '2018-12-05T21:10:49-05:00',
+           departure_time: '2018-12-05T21:10:50-05:00',
            direction_id: 0,
            schedule_relationship: null,
            status: null,
@@ -92,7 +92,7 @@ const predictions = { data:
         type: 'prediction' },
       { attributes:
          { arrival_time: '2018-12-05T21:22:49-05:00',
-           departure_time: '2018-12-05T21:22:49-05:00',
+           departure_time: '2018-12-05T21:22:50-05:00',
            direction_id: 0,
            schedule_relationship: null,
            status: null,
@@ -105,4 +105,4 @@ const predictions = { data:
         type: 'prediction' } ],
    jsonapi: { version: '1.0' } }
 
-   module.exports = predictions;
+   module.exports = predictionData;

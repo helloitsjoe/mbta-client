@@ -1,7 +1,5 @@
 const axios = require('axios');
-const { convertMs, TimeUnits, Attributes } = require('./utils');
-
-const { MINUTES } = TimeUnits;
+const { convertMs, Attributes } = require('./utils');
 
 const BASE_URL = 'https://api-v3.mbta.com';
 const PREDICTIONS = '/predictions';
@@ -33,8 +31,8 @@ class MBTA {
         // });
     }
 
-    fetchPredictions(queryParams) {
-        return axios.get(this._buildUrl(PREDICTIONS, queryParams))
+    fetchPredictions({ stopID, routeID, directionID, sort }) {
+        return axios.get(this._buildUrl(PREDICTIONS, { stopID, routeID, directionID, sort }))
             .then(res => {
                 if (!res || !res.data) {
                     throw new Error('No data from MBTA');
@@ -53,60 +51,39 @@ class MBTA {
             });
     }
 
-    arrivals({ predictions, maxArrivals, timeUnits = MINUTES, now = Date.now()/* tooCloseMins, tooFarMins, */ }) {
+    arrivals({ predictions, max, units, now = Date.now() }) {
         const finalPredictions = predictions || this.predictions;
 
         return selectArrivalISOs(finalPredictions)
+            .slice(0, max)
             .map(arrivalISO => {
-                if (arrivalISO == null) return null;
-                const msUntilArrival = new Date(arrivalISO).valueOf() - now;
-                return msUntilArrival >= 0 ? msUntilArrival : 0;
-            })
-            // .filter(msUntilArrival => {
-            //     return msUntilArrival > tooClose
-            //         && msUntilArrival < tooFar;
-            // })
-            .slice(0, maxArrivals)
-            .map(arrivalMs => {
-                // arrivalMs could be null if first stop on a route. Use departures if it's not null
+                // arrivalISO could be null if first stop on a route. Use departures if it's not null
                 // See https://www.mbta.com/developers/v3-api/best-practices for more info
-                return arrivalMs && Math.floor(convertMs(arrivalMs, timeUnits));
+                if (units == null || arrivalISO == null) return arrivalISO;
+
+                const arrivalInMs = new Date(arrivalISO).valueOf() - now;
+                const unitsUntilArrival = Math.floor(convertMs(arrivalInMs, units));
+
+                return unitsUntilArrival >= 0 ? unitsUntilArrival : 0;
             });
     }
 
-    departures({ predictions, maxDepartures, timeUnits = MINUTES, now = Date.now() }) {
+    departures({ predictions, max, units, now = Date.now() }) {
         const finalPredictions = predictions || this.predictions;
         
         return selectDepartureISOs(finalPredictions)
-            .map(departureISO => {
-                if (departureISO == null) return null;
-                const msUntilDeparture = new Date(departureISO).valueOf() - now;
-                return msUntilDeparture >= 0 ? msUntilDeparture : 0;
-            })
-            .slice(0, maxDepartures)
-            .map(departureMs => {
-                // departureMs could be null if final stop on a route
+            .slice(0, max)
+            .map(departISO => {
+                // departureISO could be null if final stop on a route
                 // See https://www.mbta.com/developers/v3-api/best-practices for more info
-                return departureMs && Math.floor(convertMs(departureMs, timeUnits));
+                if (units == null || departISO == null) return departISO;
+
+                const departureInMs = new Date(departISO).valueOf() - now;
+                const unitsUntilDepart = Math.floor(convertMs(departureInMs, units));
+
+                return unitsUntilDepart > 0 ? unitsUntilDepart : 0;
             });
     }
-
-    // _selectArrivalISOs(predictions) {
-    //     return this._selectAttribute(Attributes.arrival_time, predictions);
-    // }
-
-    // _selectDepartureISOs(predictions) {
-    //     return this._selectAttribute(Attributes.departure_time, predictions);
-    // }
-
-    // _selectAttribute(attr, predictions) {
-    //     if (!predictions || !predictions.data) {
-    //         console.warn('No prediction data...');
-    //         return [];
-    //     }
-
-    //     return predictions.data.map(vehicle => vehicle.attributes[attr]);
-    // }
 
     _buildUrl(endpoint, queryParams) {
         const url = BASE_URL + endpoint;
@@ -117,6 +94,7 @@ class MBTA {
 
         const keyAdapter = {
             stopID: 'stop',
+            routeID: 'route',
             directionID: 'direction_id',
         }
 
@@ -126,12 +104,12 @@ class MBTA {
                 if (value == null) {
                     return;
                 }
-                if (key === 'stopID' || key === 'directionID') {
-                    return `filter[${keyAdapter[key]}]=${value}`;
-                }
                 if (key === 'sort') {
                     return `sort=${value}`;
                 }
+                // if (key === 'stopID' || key === 'directionID' || key === 'route_id') {
+                    return `filter[${keyAdapter[key]}]=${value}`;
+                // }
             })
             .filter(Boolean)
             .join('&');
