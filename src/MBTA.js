@@ -1,9 +1,23 @@
 const axios = require('axios');
-const { convertMs } = require('./utils');
+const { convertMs, TimeUnits, Attributes } = require('./utils');
+
+const { MINUTES } = TimeUnits;
 
 const BASE_URL = 'https://api-v3.mbta.com';
 const PREDICTIONS = '/predictions';
 const STOPS = '/stops';
+
+const selectAttribute = attr => predictions => {
+    if (!predictions || !predictions.data) {
+        console.warn('No prediction data...');
+        return [];
+    }
+
+    return predictions.data.map(vehicle => vehicle.attributes[attr]);
+}
+
+const selectArrivalISOs = selectAttribute(Attributes.arrival_time);
+const selectDepartureISOs = selectAttribute(Attributes.departure_time);
 
 class MBTA {
 
@@ -20,9 +34,7 @@ class MBTA {
     }
 
     fetchPredictions(queryParams) {
-        const finalQuery = queryParams;
-
-        return axios.get(this._buildUrl(PREDICTIONS, finalQuery))
+        return axios.get(this._buildUrl(PREDICTIONS, queryParams))
             .then(res => {
                 if (!res || !res.data) {
                     throw new Error('No data from MBTA');
@@ -41,13 +53,13 @@ class MBTA {
             });
     }
 
-    arrivals({ predictions, maxArrivals, timeUnits = 'MINUTES', /* tooCloseMins, tooFarMins, */ }) {
+    arrivals({ predictions, maxArrivals, timeUnits = MINUTES, now = Date.now()/* tooCloseMins, tooFarMins, */ }) {
         const finalPredictions = predictions || this.predictions;
-        
-        return this._selectArrivalISOs(finalPredictions)
+
+        return selectArrivalISOs(finalPredictions)
             .map(arrivalISO => {
-                if (arrivalISO == null) return 0;
-                const msUntilArrival = new Date(arrivalISO).valueOf() - Date.now();
+                if (arrivalISO == null) return null;
+                const msUntilArrival = new Date(arrivalISO).valueOf() - now;
                 return msUntilArrival >= 0 ? msUntilArrival : 0;
             })
             // .filter(msUntilArrival => {
@@ -56,18 +68,45 @@ class MBTA {
             // })
             .slice(0, maxArrivals)
             .map(arrivalMs => {
-                return Math.floor(convertMs(arrivalMs, timeUnits));
+                // arrivalMs could be null if first stop on a route. Use departures if it's not null
+                // See https://www.mbta.com/developers/v3-api/best-practices for more info
+                return arrivalMs && Math.floor(convertMs(arrivalMs, timeUnits));
             });
     }
 
-    _selectArrivalISOs(predictions) {
-        if (!predictions || !predictions.data) {
-            console.warn('No prediction data...');
-            return [];
-        }
-
-        return predictions.data.map(vehicle => vehicle.attributes.arrival_time);
+    departures({ predictions, maxDepartures, timeUnits = MINUTES, now = Date.now() }) {
+        const finalPredictions = predictions || this.predictions;
+        
+        return selectDepartureISOs(finalPredictions)
+            .map(departureISO => {
+                if (departureISO == null) return null;
+                const msUntilDeparture = new Date(departureISO).valueOf() - now;
+                return msUntilDeparture >= 0 ? msUntilDeparture : 0;
+            })
+            .slice(0, maxDepartures)
+            .map(departureMs => {
+                // departureMs could be null if final stop on a route
+                // See https://www.mbta.com/developers/v3-api/best-practices for more info
+                return departureMs && Math.floor(convertMs(departureMs, timeUnits));
+            });
     }
+
+    // _selectArrivalISOs(predictions) {
+    //     return this._selectAttribute(Attributes.arrival_time, predictions);
+    // }
+
+    // _selectDepartureISOs(predictions) {
+    //     return this._selectAttribute(Attributes.departure_time, predictions);
+    // }
+
+    // _selectAttribute(attr, predictions) {
+    //     if (!predictions || !predictions.data) {
+    //         console.warn('No prediction data...');
+    //         return [];
+    //     }
+
+    //     return predictions.data.map(vehicle => vehicle.attributes[attr]);
+    // }
 
     _buildUrl(endpoint, queryParams) {
         const url = BASE_URL + endpoint;

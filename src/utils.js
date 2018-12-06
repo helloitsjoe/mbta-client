@@ -1,3 +1,16 @@
+// string enum
+const TimeUnits = {
+    MS: 'MS',
+    SECONDS: 'SECONDS',
+    MINUTES: 'MINUTES',
+    HOURS: 'HOURS',
+}
+
+const Attributes = {
+    arrival_time: 'arrival_time',
+    departure_time: 'departure_time',
+}
+
 const convertMs = (ms, units) => {
     const conversionMap = {
         MS: 1,
@@ -9,5 +22,7 @@ const convertMs = (ms, units) => {
 }
 
 module.exports = {
-    convertMs
+    convertMs,
+    TimeUnits,
+    Attributes,
 }
