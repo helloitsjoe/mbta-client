@@ -48,15 +48,16 @@ const selectAttribute = attr => predictions => {
 const convertTimes = selector => ({ predictions, max, convertTo, now = Date.now() }) => {
     return selector(predictions)
         .slice(0, max)
-        .map(arrivalISO => {
-            // arrivalISO could be null if first stop on a route. Use departures if it's not null
+        .map(isoString => {
+            // arrival could be null if first stop on a route. Use departures if it's not null
+            // departure could be null if final stop on a route
             // See https://www.mbta.com/developers/v3-api/best-practices for more info
-            if (convertTo == null || arrivalISO == null) return arrivalISO;
+            if (convertTo == null || isoString == null) return isoString;
 
-            const arrivalInMs = new Date(arrivalISO).valueOf() - now;
-            const unitsUntilArrival = Math.floor(convertMs(arrivalInMs, convertTo));
+            const msFromNow = new Date(isoString).valueOf() - now;
+            const unitsFromNow = Math.floor(convertMs(msFromNow, convertTo));
 
-            return unitsUntilArrival >= 0 ? unitsUntilArrival : 0;
+            return unitsFromNow >= 0 ? unitsFromNow : 0;
         });
 }
 

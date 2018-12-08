@@ -18,16 +18,28 @@ class MBTA {
         this.stops = [];
     }
 
-    async fetchPredictions({ stopID, routeID, directionID, sort }) {
-        const url = buildUrl(PREDICTIONS, { stopID, routeID, directionID, sort });
+    /**
+     * Fetches predictions from the MBTA v2 API
+     * https://api-v3.mbta.com
+     */
+    async fetchPredictions({ stopId, routeID, tripID, directionID, sort } = {}) {
+        const url = buildUrl(PREDICTIONS, { stopId, routeID, tripID, directionID, sort });
         return this.predictions = await this.fetch(url);
     }
 
+    /**
+     * Select arrival times from predictions with options to limit
+     * the number of arrivals returned, and convert them to time from now
+     */
     arrivals({ predictions, max, convertTo, now } = {}) {
         const pred = predictions || this.predictions;
+        // TODO: Maybe move predictions out of the object and curry?
         return arrivalsWithConversion({ predictions: pred, max, convertTo, now });
     }
-
+    /**
+     * Select departure times from predictions with options to limit
+     * the number of arrivals returned, and convert them to time from now 
+     */
     departures({ predictions, max, convertTo, now } = {}) {
         const pred = predictions || this.predictions;
         return departuresWithConversion({ predictions: pred, max, convertTo, now });
