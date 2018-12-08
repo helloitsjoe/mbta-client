@@ -1,6 +1,5 @@
 const MBTA = require("../MBTA");
 const predictions = require("./data/predictionData");
-// const util = require('util')
 
 const {
   TimeUnits: { MINUTES, MS }
@@ -14,16 +13,20 @@ describe("predictions", () => {
     mbta = new MBTA();
   });
 
+  // it.only('test live data', async () => {
+  //   // Test live data
+  //   const util = require('util');
+  //   const pred = await mbta.fetchPredictions({ tripID: 38272699 });
+  //   console.log(util.inspect(pred, {showHidden: false, depth: null}));
+  // });
+
   it("fetchPredictions", async () => {
     const fetchService = jest.fn().mockResolvedValue(predictions);
     const mbta = new MBTA(null, fetchService);
     expect(mbta.predictions).toEqual([]);
     const fetched = await mbta.fetchPredictions({});
     expect(fetched).toEqual(predictions);
-    expect(mbta.predictions).toEqual(predictions);
-
-    // const pred = await mbta.fetchPredictions({ routeID: 1 });
-    // console.log(util.inspect(pred, {showHidden: false, depth: null}))
+    expect(mbta.predictions).toEqual(predictions);    
   });
 
   describe("arrivals/departures", () => {

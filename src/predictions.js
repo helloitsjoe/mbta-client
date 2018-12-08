@@ -9,6 +9,7 @@ function buildUrl(endpoint, queryParams) {
     }
 
     const keyAdapter = {
+        tripID: 'trip',
         stopID: 'stop',
         routeID: 'route',
         directionID: 'direction_id',
@@ -17,6 +18,7 @@ function buildUrl(endpoint, queryParams) {
     const queryString = Object
         .entries(queryParams)
         .map(([key, value]) => {
+            console.log(`key:`, key);
             if (value == null) {
                 return;
             }
