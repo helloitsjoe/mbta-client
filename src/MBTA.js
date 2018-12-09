@@ -22,8 +22,8 @@ class MBTA {
      * Fetches predictions from the MBTA v2 API
      * https://api-v3.mbta.com
      */
-    async fetchPredictions({ stopId, routeID, tripID, directionID, sort } = {}) {
-        const url = buildUrl(PREDICTIONS, { stopId, routeID, tripID, directionID, sort });
+    async fetchPredictions({ stopID, routeID, tripID, directionID, sort } = {}) {
+        const url = buildUrl(PREDICTIONS, { stopID, routeID, tripID, directionID, sort });
         return this.predictions = await this.fetch(url);
     }
 
@@ -38,7 +38,7 @@ class MBTA {
     }
     /**
      * Select departure times from predictions with options to limit
-     * the number of arrivals returned, and convert them to time from now 
+     * the number of arrivals returned, and convert them to time from now
      */
     departures({ predictions, max, convertTo, now } = {}) {
         const pred = predictions || this.predictions;
