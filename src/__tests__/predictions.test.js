@@ -16,7 +16,7 @@ describe("predictions", () => {
   // it.only('test live data', async () => {
   //   // Test live data
   //   const util = require('util');
-  //   const pred = await mbta.fetchPredictions({ tripID: 38272699 });
+  //   const pred = await mbta.fetchPredictions({ stopID: 2056, limit: 1 });
   //   console.log(util.inspect(pred, {showHidden: false, depth: null}));
   // });
 
@@ -26,7 +26,7 @@ describe("predictions", () => {
     expect(mbta.predictions).toEqual([]);
     const fetched = await mbta.fetchPredictions({});
     expect(fetched).toEqual(predictions);
-    expect(mbta.predictions).toEqual(predictions);    
+    expect(mbta.predictions).toEqual(predictions);
   });
 
   describe("arrivals/departures", () => {

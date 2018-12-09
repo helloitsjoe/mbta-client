@@ -22,8 +22,8 @@ class MBTA {
      * Fetches predictions from the MBTA v2 API
      * https://api-v3.mbta.com
      */
-    async fetchPredictions({ stopID, routeID, tripID, directionID, sort } = {}) {
-        const url = buildUrl(PREDICTIONS, { stopID, routeID, tripID, directionID, sort });
+    async fetchPredictions(queryParams) {
+        const url = buildUrl(PREDICTIONS, queryParams);
         return this.predictions = await this.fetch(url);
     }
 

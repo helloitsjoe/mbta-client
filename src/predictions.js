@@ -18,12 +18,14 @@ function buildUrl(endpoint, queryParams) {
     const queryString = Object
         .entries(queryParams)
         .map(([key, value]) => {
-            console.log(`key:`, key);
             if (value == null) {
                 return;
             }
             if (key === 'sort') {
                 return `sort=${value}`;
+            }
+            if (key === 'limit' || key === 'offset') {
+                return `page[${key}]=${value}`;
             }
             return `filter[${keyAdapter[key]}]=${value}`;
         })
