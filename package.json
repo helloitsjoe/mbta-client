@@ -4,7 +4,8 @@
   "description": "MBTA API JavaScript client",
   "main": "index.js",
   "scripts": {
-    "test": "jest --testPathPattern=test.js"
+    "test": "jest --testPathPattern=__tests__/index.test.js",
+    "lint": "eslint --fix-dry-run"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,12 @@
     "axios": "^0.18.0"
   },
   "devDependencies": {
+    "eslint": "^5.10.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.2",
+    "eslint-plugin-react": "^7.11.1",
+    "eslint-plugin-standard": "^4.0.0",
     "jest": "^23.6.0",
     "prettier": "^1.15.3"
   }
