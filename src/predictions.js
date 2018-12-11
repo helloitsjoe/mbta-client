@@ -9,11 +9,25 @@ const Pages = {
   last: 'last',
 };
 
-function buildUrl(endpoint, queryParams) {
+function buildUrl(endpoint, apiKey, queryParams) {
   const url = BASE_URL + endpoint;
 
   if (!queryParams || !Object.keys(queryParams).length) {
     return url;
+  }
+
+  const { offset, limit, latitude, longitude, radius } = queryParams;
+
+  if (offset != null && limit == null) {
+    console.warn('page[offset] will have no effect without page[limit]');
+  }
+
+  if ((latitude != null && longitude == null) || (latitude == null && longitude != null)) {
+    console.warn('Latitude and longitude must both be present');
+  }
+
+  if (radius != null && latitude == null) {
+    console.warn('Radius requires latitude and longitude');
   }
 
   const queryString = Object.entries(queryParams)
@@ -32,18 +46,14 @@ function buildUrl(endpoint, queryParams) {
     .filter(Boolean)
     .join('&');
 
-  if (queryString.includes('offset') && !queryString.includes('limit')) {
-    console.info('page[offset] will have no effect without page[limit]');
-  }
-
-  if (this.apiKey == null) {
+  if (apiKey == null) {
     console.warn(
       'API key is missing. Keys available at https://api-v3.mbta.com'
     );
     return `${url}?${queryString}`;
   }
 
-  return `${url}?${queryString}&api_key=${this.apiKey}`;
+  return `${url}?${queryString}&api_key=${apiKey}`;
 }
 
 const convertTimes = selector => options => {

@@ -128,26 +128,27 @@ const predictionData = {
 const limitedPredictionData = {
   data: [{
     attributes: {
-      arrival_time: '2018-12-08T22:43:22-05:00',
-      departure_time: '2018-12-08T22:43:22-05:00',
+      arrival_time: '2018-12-10T20:02:58-05:00',
+      departure_time: '2018-12-10T20:04:10-05:00',
       direction_id: 1,
       schedule_relationship: null,
       status: null,
-      stop_sequence: 8,
+      stop_sequence: 130,
     },
-    id: 'prediction-38272652-2056-8',
-    relationships:
-      { route: { data: { id: '71', type: 'route' } },
-        stop: { data: { id: '2056', type: 'stop' } },
-        trip: { data: { id: '38272652', type: 'trip' } } },
+    id: 'prediction-38066487-21:00-KL-70080-130',
+    relationships: {
+      route: { data: { id: 'Red', type: 'route' } },
+      stop: { data: { id: '70080', type: 'stop' } },
+      trip: { data: { id: '38066487-21:00-KL', type: 'trip' } },
+    },
     type: 'prediction',
   }],
   jsonapi: { version: '1.0' },
   links: {
-    first: 'https://api-v3.mbta.com/predictions?filter[stop]=2056&page[limit]=1&page[offset]=0',
-    last: 'https://api-v3.mbta.com/predictions?filter[stop]=2056&page[limit]=1&page[offset]=3',
-    next: 'https://api-v3.mbta.com/predictions?filter[stop]=2056&page[limit]=1&page[offset]=3',
-    prev: 'https://api-v3.mbta.com/predictions?filter[stop]=2056&page[limit]=1&page[offset]=1',
+    first: 'https://api-v3.mbta.com/predictions?filter[stop]=70080&page[limit]=1&page[offset]=0',
+    last: 'https://api-v3.mbta.com/predictions?filter[stop]=70080&page[limit]=1&page[offset]=13',
+    next: 'https://api-v3.mbta.com/predictions?filter[stop]=70080&page[limit]=1&page[offset]=3',
+    prev: 'https://api-v3.mbta.com/predictions?filter[stop]=70080&page[limit]=1&page[offset]=1',
   },
 };
 

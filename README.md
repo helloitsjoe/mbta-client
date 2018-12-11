@@ -21,25 +21,23 @@ Instantiate MBTA with your API key
 ```js
 import MBTA from 'mbta-client';
 
-const apiKey = process.env.API_KEY;
-const mbta = new MBTA(apiKey);
+const mbta = new MBTA(YOUR_API_KEY);
 ```
 
-Fetch predictions, providing at least one filter (`stopID`, `routeID`, or `tripID`);
+Fetch predictions, providing at least one filter (`stop`, `route`, or `trip`);
 
 ```js
-const predictions = await mbta.fetchPredictions({ stopID: 42 });
+const predictions = await mbta.fetchPredictions({ stop: 42 });
 const arrivals = mbta.arrivals({ predictions });
 ```
 
-You can filter predictions further by providing `limit` to limit the number of predictions, sort by `arrival_time`, `departure_time`, etc. Set `descending` to true to reverse the sort order.
-
+You can limit the number of results, sort by `arrival_time`, `departure_time`, etc., and reverse the sort order with `descending: true`.
 ```js
 const predictions = mbta.fetchPredictions({
-  stopID: 42,
-  limit: 4,
-  sort: 'arrival_time',
-  descending: true,
+  stop: 42,
+  limit: 4, // Truncate the number of results
+  sort: 'arrival_time', // Sort by `arrival_time`, `departure_time`, etc.
+  descending: true, // Set `descending` to true to reverse the sort order.
 });
 const arrivals = mbta.arrivals({ convertTo: 'MINUTES' });
 ```
@@ -47,10 +45,7 @@ const arrivals = mbta.arrivals({ convertTo: 'MINUTES' });
 If you need paginated results, provide a `limit` and optional `offset` with the request. Helper functions will return the first, next, previous and last pages.
 
 ```js
-const predictions = await mbta.fetchPredictions({
-    stopID: 42,
-    limit: 2,
-});
+const predictions = await mbta.fetchPredictions({ stop: 42, limit: 2 });
 
 // Use the result to get the next page
 const nextPageResults = await mbta.getNextPage(predictions);

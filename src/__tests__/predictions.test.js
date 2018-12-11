@@ -3,12 +3,10 @@ const MBTA = require('../MBTA');
 const { selectPage, Pages } = require('../predictions');
 const {
   predictionData: predictions,
-  limitedPredictionData,
+  limitedPredictionData: limitData,
 } = require('./data/predictionData');
 
-const {
-  TimeUnits: { MINUTES, MS },
-} = require('../utils');
+const { TimeUnits: { MINUTES, MS } } = require('../utils');
 
 describe('predictions', () => {
   let mbta;
@@ -22,8 +20,9 @@ describe('predictions', () => {
   //   // Test live data
   //   // TODO: Page offset
   //   // TODO: Page limit
-  //   const pred = await mbta.fetchPredictions({ route: 71, limit: 2 });
+  //   const pred = await mbta.fetchPredictions({ latitude: 42.369, longitude: -71.174 });
   //   console.log(util.inspect(pred, { showHidden: false, depth: null }));
+  //   console.log(`pred.data.length:`, pred.data.length);
   // });
 
   it('fetchPredictions', async () => {
@@ -82,12 +81,12 @@ describe('predictions', () => {
       ['getFirstPage', 0],
       ['getNextPage', 3],
       ['getPrevPage', 1],
-      ['getLastPage', 3],
-    ])('paginates', async (fn, offset) => {
+      ['getLastPage', 13],
+    ])('%s', async (fn, offset) => {
       const fetchService = jest.fn();
       mbta = new MBTA(null, fetchService);
-      await mbta[fn](limitedPredictionData);
-      const url = `https://api-v3.mbta.com/predictions?filter[stop]=2056&page[limit]=1&page[offset]=${offset}`;
+      await mbta[fn](limitData);
+      const url = `https://api-v3.mbta.com/predictions?filter[stop]=70080&page[limit]=1&page[offset]=${offset}`;
       expect(fetchService).toBeCalledWith(url);
     });
 
@@ -106,18 +105,10 @@ describe('predictions', () => {
     });
 
     it('selectPage selects the correct page offset', () => {
-      expect(selectPage(Pages.first, limitedPredictionData)).toMatch(
-        '[offset]=0'
-      );
-      expect(selectPage(Pages.next, limitedPredictionData)).toMatch(
-        '[offset]=3'
-      );
-      expect(selectPage(Pages.prev, limitedPredictionData)).toMatch(
-        '[offset]=1'
-      );
-      expect(selectPage(Pages.last, limitedPredictionData)).toMatch(
-        '[offset]=3'
-      );
+      expect(selectPage(Pages.first, limitData)).toMatch('[offset]=0');
+      expect(selectPage(Pages.next, limitData)).toMatch('[offset]=3');
+      expect(selectPage(Pages.prev, limitData)).toMatch('[offset]=1');
+      expect(selectPage(Pages.last, limitData)).toMatch('[offset]=13');
     });
 
     it('returns arrival ISO times if no convert', () => {

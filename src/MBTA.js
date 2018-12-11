@@ -24,13 +24,13 @@ class MBTA {
   }
 
   async fetchPredictions(queryParams) {
-    const url = buildUrl(PREDICTIONS, queryParams);
+    const url = buildUrl(PREDICTIONS, this.apiKey, queryParams);
     this.predictions = await this.fetch(url);
     return this.predictions;
   }
 
   async fetchStops(queryParams) {
-    const url = buildUrl(STOPS, queryParams);
+    const url = buildUrl(STOPS, this.apiKey, queryParams);
     this.predictions = await this.fetch(url);
     return this.predictions;
   }
