@@ -2,6 +2,13 @@ const { convertMs, Attributes } = require('./utils');
 
 const BASE_URL = 'https://api-v3.mbta.com';
 
+const Pages = {
+  first: 'first',
+  next: 'next',
+  prev: 'prev',
+  last: 'last',
+};
+
 function buildUrl(endpoint, queryParams) {
   const url = BASE_URL + endpoint;
 
@@ -9,25 +16,18 @@ function buildUrl(endpoint, queryParams) {
     return url;
   }
 
-  const keyAdapter = {
-    tripID: 'trip',
-    stopID: 'stop',
-    routeID: 'route',
-    directionID: 'direction_id',
-  };
-
   const queryString = Object.entries(queryParams)
     .map(([key, value]) => {
       if (value == null) {
         return null;
       }
       if (key === 'sort') {
-        return `sort=${value}`;
+        return queryParams.descending ? `sort=-${value}` : `sort=${value}`;
       }
       if (key === 'limit' || key === 'offset') {
         return `page[${key}]=${value}`;
       }
-      return `filter[${keyAdapter[key]}]=${value}`;
+      return `filter[${key}]=${value}`;
     })
     .filter(Boolean)
     .join('&');
@@ -78,7 +78,17 @@ const selectAttribute = attr => predictions => {
   return predictions.data.map(vehicle => vehicle.attributes[attr]);
 };
 
-const selectLinks = predictions => predictions && predictions.links;
+const selectLinks = predictions => {
+  if (!predictions) {
+    throw new Error('No predictions, call fetchPredictions() before getting page links');
+  }
+  if (!predictions.links) {
+    console.warn('predictions.links does not exist. Include "limit" in fetchPredictions options');
+  }
+  return predictions && predictions.links;
+};
+
+const selectPage = (page, predictions) => selectLinks(predictions)[page];
 
 const selectArrivalISOs = selectAttribute(Attributes.arrival_time);
 const selectDepartureISOs = selectAttribute(Attributes.departure_time);
@@ -91,5 +101,6 @@ module.exports = {
   convertTimes,
   arrivalsWithConversion,
   departuresWithConversion,
-  selectLinks,
+  selectPage,
+  Pages,
 };

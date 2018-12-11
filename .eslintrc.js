@@ -4,6 +4,7 @@ module.exports = {
         'jest': true
     },
     'rules': {
+        'quotes': 'off',
         'no-console': 'off',
         'object-curly-newline': 'off',
         'arrow-parens': ['error', 'as-needed'],

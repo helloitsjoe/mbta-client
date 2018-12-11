@@ -1,11 +1,14 @@
 // const util = require('util');
 const MBTA = require('../MBTA');
+const { selectPage, Pages } = require('../predictions');
 const {
   predictionData: predictions,
   limitedPredictionData,
 } = require('./data/predictionData');
 
-const { TimeUnits: { MINUTES, MS } } = require('../utils');
+const {
+  TimeUnits: { MINUTES, MS },
+} = require('../utils');
 
 describe('predictions', () => {
   let mbta;
@@ -19,7 +22,7 @@ describe('predictions', () => {
   //   // Test live data
   //   // TODO: Page offset
   //   // TODO: Page limit
-  //   const pred = await mbta.fetchPredictions({ stopID: 2056, limit: 1 });
+  //   const pred = await mbta.fetchPredictions({ route: 71, limit: 2 });
   //   console.log(util.inspect(pred, { showHidden: false, depth: null }));
   // });
 
@@ -75,19 +78,46 @@ describe('predictions', () => {
       ]);
     });
 
-    it('paginates', async () => {
-      const fetchService = jest.fn().mockResolvedValue(limitedPredictionData);
+    it.each([
+      ['getFirstPage', 0],
+      ['getNextPage', 3],
+      ['getPrevPage', 1],
+      ['getLastPage', 3],
+    ])('paginates', async (fn, offset) => {
+      const fetchService = jest.fn();
       mbta = new MBTA(null, fetchService);
-      const fetched = await mbta.fetchPredictions({ stopID: 2056, limit: 1, offset: 2 });
-      const pages = mbta.paginate(fetched);
-      expect(pages).toMatchInlineSnapshot(`
-Object {
-  "first": "https://api-v3.mbta.com/predictions?filter[stop]=2056&page[limit]=1&page[offset]=0",
-  "last": "https://api-v3.mbta.com/predictions?filter[stop]=2056&page[limit]=1&page[offset]=3",
-  "next": "https://api-v3.mbta.com/predictions?filter[stop]=2056&page[limit]=1&page[offset]=3",
-  "prev": "https://api-v3.mbta.com/predictions?filter[stop]=2056&page[limit]=1&page[offset]=1",
-}
-`);
+      await mbta[fn](limitedPredictionData);
+      const url = `https://api-v3.mbta.com/predictions?filter[stop]=2056&page[limit]=1&page[offset]=${offset}`;
+      expect(fetchService).toBeCalledWith(url);
+    });
+
+    it('throws if no predictions provided', async () => {
+      expect.assertions(2);
+      const fetchService = jest.fn();
+      mbta = new MBTA(null, fetchService);
+      try {
+        await mbta.getFirstPage();
+      } catch (err) {
+        expect(err.message).toMatchInlineSnapshot(
+          `"No predictions, call fetchPredictions() before getting page links"`
+        );
+      }
+      expect(fetchService).not.toBeCalled();
+    });
+
+    it('selectPage selects the correct page offset', () => {
+      expect(selectPage(Pages.first, limitedPredictionData)).toMatch(
+        '[offset]=0'
+      );
+      expect(selectPage(Pages.next, limitedPredictionData)).toMatch(
+        '[offset]=3'
+      );
+      expect(selectPage(Pages.prev, limitedPredictionData)).toMatch(
+        '[offset]=1'
+      );
+      expect(selectPage(Pages.last, limitedPredictionData)).toMatch(
+        '[offset]=3'
+      );
     });
 
     it('returns arrival ISO times if no convert', () => {

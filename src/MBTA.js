@@ -2,7 +2,8 @@ const {
   buildUrl,
   arrivalsWithConversion,
   departuresWithConversion,
-  selectLinks,
+  selectPage,
+  Pages,
 } = require('./predictions');
 const fetchService = require('./fetchService');
 
@@ -53,16 +54,26 @@ class MBTA {
     return departuresWithConversion({ predictions: pred, convertTo, now });
   }
 
-  /**
-   * If predictions are paginated (with page[limit]),
-   * returns paginated links: first, next, last[, previous]
-   */
-  paginate(predictions) {
-    const pred = predictions || this.predictions;
-    if (!pred.links) {
-      throw new Error('Pagination requires predictions query to include "limit"');
-    }
-    return selectLinks(pred);
+  // TODO: How to deal with multiple next/previous requests?
+  // Save each request to this.predictions, or require it to be passed in?
+  async getFirstPage(predictions) {
+    const url = selectPage(Pages.first, predictions);
+    return this.fetch(url);
+  }
+
+  async getNextPage(predictions) {
+    const url = selectPage(Pages.next, predictions);
+    return this.fetch(url);
+  }
+
+  async getPrevPage(predictions) {
+    const url = selectPage(Pages.prev, predictions);
+    return this.fetch(url);
+  }
+
+  async getLastPage(predictions) {
+    const url = selectPage(Pages.last, predictions);
+    return this.fetch(url);
   }
 }
 
