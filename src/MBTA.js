@@ -8,6 +8,7 @@ const {
 const fetchService = require('./fetchService');
 
 const PREDICTIONS = '/predictions';
+const ROUTES = '/routes';
 const STOPS = '/stops';
 
 /**
@@ -31,6 +32,12 @@ class MBTA {
 
   async fetchStops(queryParams) {
     const url = buildUrl(STOPS, this.apiKey, queryParams);
+    this.predictions = await this.fetch(url);
+    return this.predictions;
+  }
+
+  async fetchRoutes(queryParams) {
+    const url = buildUrl(ROUTES, this.apiKey, queryParams);
     this.predictions = await this.fetch(url);
     return this.predictions;
   }

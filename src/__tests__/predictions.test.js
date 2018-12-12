@@ -1,3 +1,5 @@
+/* eslint-disable indent */
+
 // const util = require('util');
 const MBTA = require('../MBTA');
 const { selectPage, Pages } = require('../predictions');
@@ -18,11 +20,15 @@ describe('predictions', () => {
 
   // it.only('test live data', async () => {
   //   // Test live data
-  //   // TODO: Page offset
-  //   // TODO: Page limit
-  //   const pred = await mbta.fetchPredictions({ latitude: 42.369, longitude: -71.174 });
+  //   // const routes = await mbta.fetchRoutes();
+  //   // const pred = routes.data.map(ea => ({
+  //   //   id: ea.id,
+  //   //   abbr: ea.attributes.short_name,
+  //   //   name: ea.attributes.long_name,
+  //   //   directions: ea.attributes.direction_names,
+  //   // }));
+  //   const pred = await mbta.fetchPredictions({ stop: [2056] });
   //   console.log(util.inspect(pred, { showHidden: false, depth: null }));
-  //   console.log(`pred.data.length:`, pred.data.length);
   // });
 
   it('fetchPredictions', async () => {
@@ -32,6 +38,32 @@ describe('predictions', () => {
     const fetched = await mbta.fetchPredictions({});
     expect(fetched).toEqual(predictions);
     expect(mbta.predictions).toEqual(predictions);
+  });
+
+  it.each`
+    name                      | queryParams                    | expected
+    ${'single route'}         | ${{route: 1}}                  | ${'1'}
+    ${'single route array'}   | ${{route: [1]}}                | ${'1'}
+    ${'multi route array'}    | ${{route: [1, 'Red']}}         | ${'1,Red'}
+
+    ${'single stop'}          | ${{stop: 64}}                  | ${'64'}
+    ${'single stop array'}    | ${{stop: [64]}}                | ${'64'}
+    ${'multi stop array'}     | ${{stop: [64, 110]}}           | ${'64,110'}
+
+    ${'single trip'}          | ${{trip: 5}}                   | ${'5'}
+    ${'single trip array'}    | ${{trip: [5]}}                 | ${'5'}
+    ${'multi trip array'}     | ${{trip: [5, 22]}}             | ${'5,22'}
+
+    ${'include single'}       | ${{include: 'vehicle'}}        | ${'vehicle'}
+    ${'include single array'} | ${{include: ['stop']}}         | ${'stop'}
+    ${'include multi array'}  | ${{include: ['stop', 'trip']}} | ${'stop,trip'}
+  `(`query: $name`, async ({ queryParams, expected }) => {
+    const fetchService = jest.fn();
+    mbta = new MBTA(null, fetchService);
+    await mbta.fetchPredictions(queryParams);
+    const filter = Object.keys(queryParams)[0];
+    const url = `https://api-v3.mbta.com/predictions?${filter}=${expected}`;
+    expect(fetchService).toBeCalledWith(url);
   });
 
   describe('arrivals/departures', () => {

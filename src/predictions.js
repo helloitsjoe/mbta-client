@@ -9,6 +9,10 @@ const Pages = {
   last: 'last',
 };
 
+// This will create a comma separated string of multiple values,
+// or just return a single value, whether or not it's in an array
+const commaSeparate = value => [].concat(value).join(',');
+
 function buildUrl(endpoint, apiKey, queryParams) {
   const url = BASE_URL + endpoint;
 
@@ -41,7 +45,9 @@ function buildUrl(endpoint, apiKey, queryParams) {
       if (key === 'limit' || key === 'offset') {
         return `page[${key}]=${value}`;
       }
-      return `filter[${key}]=${value}`;
+      // MBTA docs say to use filter[stop], filter[route], etc, but they
+      // also support stop, route, etc. without filter
+      return `${key}=${commaSeparate(value)}`;
     })
     .filter(Boolean)
     .join('&');
