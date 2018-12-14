@@ -49,15 +49,15 @@ const selectLinks = predictions => {
   return predictions.links;
 };
 
-const selectIncluded = (predictions, type) => {
-  if (!predictions) {
-    throw new Error('No predictions, call fetchPredictions() before accessing this value');
+const selectIncluded = (response, type) => {
+  if (!response) {
+    throw new Error('included() requires an MBTA response as an argument');
   }
-  if (!predictions.included) {
-    console.warn('predictions.included does not exist, "include" must be in fetchPredictions options');
+  if (!response.included) {
+    console.warn('response.included does not exist, "include" must be in fetch options');
     return [];
   }
-  return predictions.included.filter(inc => {
+  return response.included.filter(inc => {
     if (Array.isArray(type)) {
       return type.includes(inc.type);
     }

@@ -9,6 +9,7 @@ const { buildUrl } = require('./utils');
 const fetchService = require('./fetchService');
 
 const PREDICTIONS = '/predictions';
+const VEHICLES = '/vehicles';
 const ROUTES = '/routes';
 const STOPS = '/stops';
 
@@ -22,6 +23,8 @@ class MBTA {
     this.fetch = fetch;
     // Ideally these would have a public getter and private setter
     this.predictions = [];
+    this.vehicles = [];
+    this.routes = [];
     this.stops = [];
   }
 
@@ -33,14 +36,20 @@ class MBTA {
 
   async fetchStops(queryParams) {
     const url = buildUrl(STOPS, this.apiKey, queryParams);
-    this.predictions = await this.fetch(url);
-    return this.predictions;
+    this.stops = await this.fetch(url);
+    return this.stops;
   }
 
   async fetchRoutes(queryParams) {
     const url = buildUrl(ROUTES, this.apiKey, queryParams);
-    this.predictions = await this.fetch(url);
-    return this.predictions;
+    this.routes = await this.fetch(url);
+    return this.routes;
+  }
+
+  async fetchVehicles(queryParams) {
+    const url = buildUrl(VEHICLES, this.apiKey, queryParams);
+    this.vehicles = await this.fetch(url);
+    return this.vehicles;
   }
 
   /**
@@ -67,9 +76,8 @@ class MBTA {
    * objects matching any of the specified types. Omitting 'type'
    * will return the unfiltered 'included' array.
    */
-  included(predictions, type) {
-    const pred = predictions || this.predictions;
-    return selectIncluded(pred, type);
+  included(response, type) {
+    return selectIncluded(response, type);
   }
 
   // TODO: How to deal with multiple next/previous requests?
