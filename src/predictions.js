@@ -99,9 +99,25 @@ const selectLinks = predictions => {
     throw new Error('No predictions, call fetchPredictions() before getting page links');
   }
   if (!predictions.links) {
-    console.warn('predictions.links does not exist. Include "limit" in fetchPredictions options');
+    console.warn('predictions.links does not exist, "limit" must be in fetchPredictions options');
   }
-  return predictions && predictions.links;
+  return predictions.links;
+};
+
+const selectIncluded = (predictions, type) => {
+  if (!predictions) {
+    throw new Error('No predictions, call fetchPredictions() before accessing this value');
+  }
+  if (!predictions.included) {
+    console.warn('predictions.included does not exist, "include" must be in fetchPredictions options');
+    return [];
+  }
+  return predictions.included.filter(inc => {
+    if (Array.isArray(type)) {
+      return type.includes(inc.type);
+    }
+    return type === inc.type || type == null;
+  });
 };
 
 const selectPage = (page, predictions) => selectLinks(predictions)[page];
@@ -117,6 +133,7 @@ module.exports = {
   convertTimes,
   arrivalsWithConversion,
   departuresWithConversion,
+  selectIncluded,
   selectPage,
   Pages,
 };

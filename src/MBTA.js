@@ -2,6 +2,7 @@ const {
   buildUrl,
   arrivalsWithConversion,
   departuresWithConversion,
+  selectIncluded,
   selectPage,
   Pages,
 } = require('./predictions');
@@ -59,6 +60,16 @@ class MBTA {
   departures({ predictions, convertTo, now } = {}) {
     const pred = predictions || this.predictions;
     return departuresWithConversion({ predictions: pred, convertTo, now });
+  }
+
+  /**
+   * Select included objects by type. An array of types will return
+   * objects matching any of the specified types. Omitting 'type'
+   * will return the unfiltered 'included' array.
+   */
+  included(predictions, type) {
+    const pred = predictions || this.predictions;
+    return selectIncluded(pred, type);
   }
 
   // TODO: How to deal with multiple next/previous requests?
