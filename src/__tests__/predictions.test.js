@@ -1,6 +1,6 @@
-/* eslint-disable indent */
-
 // const util = require('util');
+
+/* eslint-disable indent */
 const MBTA = require('../MBTA');
 const { selectPage, Pages } = require('../predictions');
 const {
@@ -8,9 +8,7 @@ const {
   limitedPredictionData: limitData,
 } = require('./data/predictionData');
 
-const {
-  TimeUnits: { MINUTES, MS },
-} = require('../utils');
+const {TimeUnits: { MINUTES, MS }} = require('../utils');
 
 describe('predictions', () => {
   let mbta;
@@ -29,18 +27,9 @@ describe('predictions', () => {
   //   //   name: ea.attributes.long_name,
   //   //   directions: ea.attributes.direction_names,
   //   // }));
-  //   const pred = await mbta.fetchPredictions({ stop: 'place-bbsta', include: 'route'});
+  //   const pred = await mbta.fetchVehicles({ limit: 4});
   //   console.log(util.inspect(pred, { showHidden: false, depth: null }));
   // });
-
-  it('fetchPredictions', async () => {
-    const fetchService = jest.fn().mockResolvedValue(predictions);
-    mbta = new MBTA(null, fetchService);
-    expect(mbta.predictions).toEqual([]);
-    const fetched = await mbta.fetchPredictions({});
-    expect(fetched).toEqual(predictions);
-    expect(mbta.predictions).toEqual(predictions);
-  });
 
   it.each`
     name                      | queryParams                      | expected
@@ -57,7 +46,6 @@ describe('predictions', () => {
   });
 
   describe('arrivals/departures', () => {
-    // arrivals and departures use the same undelying function
     it('returns empty array if no predictions', () => {
       expect(mbta.arrivals({})).toEqual([]);
       expect(mbta.departures({})).toEqual([]);
@@ -97,33 +85,6 @@ describe('predictions', () => {
         2935000,
         3655000,
       ]);
-    });
-
-    it.each([
-      ['getFirstPage', 0],
-      ['getNextPage', 3],
-      ['getPrevPage', 1],
-      ['getLastPage', 13],
-    ])('%s', async (fn, offset) => {
-      const fetchService = jest.fn();
-      mbta = new MBTA(null, fetchService);
-      await mbta[fn](limitData);
-      const url = `https://api-v3.mbta.com/predictions?filter[stop]=70080&page[limit]=1&page[offset]=${offset}`;
-      expect(fetchService).toBeCalledWith(url);
-    });
-
-    it('throws if no predictions provided', async () => {
-      expect.assertions(2);
-      const fetchService = jest.fn();
-      mbta = new MBTA(null, fetchService);
-      try {
-        await mbta.getFirstPage();
-      } catch (err) {
-        expect(err.message).toMatchInlineSnapshot(
-          `"No predictions, call fetchPredictions() before accessing this value"`
-        );
-      }
-      expect(fetchService).not.toBeCalled();
     });
 
     it('selectPage selects the correct page offset', () => {
