@@ -1,11 +1,11 @@
 const {
-  buildUrl,
   arrivalsWithConversion,
   departuresWithConversion,
   selectIncluded,
   selectPage,
   Pages,
 } = require('./predictions');
+const { buildUrl } = require('./utils');
 const fetchService = require('./fetchService');
 
 const PREDICTIONS = '/predictions';

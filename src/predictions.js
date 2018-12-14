@@ -1,66 +1,11 @@
 const { convertMs, Attributes } = require('./utils');
 
-const BASE_URL = 'https://api-v3.mbta.com';
-
 const Pages = {
   first: 'first',
   next: 'next',
   prev: 'prev',
   last: 'last',
 };
-
-// This will create a comma separated string of multiple values,
-// or just return a single value, whether or not it's in an array
-const commaSeparate = value => [].concat(value).join(',');
-
-function buildUrl(endpoint, apiKey, queryParams) {
-  const url = BASE_URL + endpoint;
-
-  if (!queryParams || !Object.keys(queryParams).length) {
-    return url;
-  }
-
-  const { offset, limit, latitude, longitude, radius } = queryParams;
-
-  if (offset != null && limit == null) {
-    console.warn('page[offset] will have no effect without page[limit]');
-  }
-
-  if ((latitude != null && longitude == null) || (latitude == null && longitude != null)) {
-    console.warn('Latitude and longitude must both be present');
-  }
-
-  if (radius != null && latitude == null) {
-    console.warn('Radius requires latitude and longitude');
-  }
-
-  const queryString = Object.entries(queryParams)
-    .map(([key, value]) => {
-      if (value == null) {
-        return null;
-      }
-      if (key === 'sort') {
-        return queryParams.descending ? `sort=-${value}` : `sort=${value}`;
-      }
-      if (key === 'limit' || key === 'offset') {
-        return `page[${key}]=${value}`;
-      }
-      // MBTA docs say to use filter[stop], filter[route], etc, but they
-      // also support stop, route, etc. without filter
-      return `${key}=${commaSeparate(value)}`;
-    })
-    .filter(Boolean)
-    .join('&');
-
-  if (apiKey == null) {
-    console.warn(
-      'API key is missing. Keys available at https://api-v3.mbta.com'
-    );
-    return `${url}?${queryString}`;
-  }
-
-  return `${url}?${queryString}&api_key=${apiKey}`;
-}
 
 const convertTimes = selector => options => {
   const {
@@ -96,7 +41,7 @@ const selectAttribute = attr => predictions => {
 
 const selectLinks = predictions => {
   if (!predictions) {
-    throw new Error('No predictions, call fetchPredictions() before getting page links');
+    throw new Error('No predictions, call fetchPredictions() before accessing this value');
   }
   if (!predictions.links) {
     console.warn('predictions.links does not exist, "limit" must be in fetchPredictions options');
@@ -129,7 +74,6 @@ const arrivalsWithConversion = convertTimes(selectArrivalISOs);
 const departuresWithConversion = convertTimes(selectDepartureISOs);
 
 module.exports = {
-  buildUrl,
   convertTimes,
   arrivalsWithConversion,
   departuresWithConversion,

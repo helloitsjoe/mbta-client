@@ -8,7 +8,9 @@ const {
   limitedPredictionData: limitData,
 } = require('./data/predictionData');
 
-const { TimeUnits: { MINUTES, MS } } = require('../utils');
+const {
+  TimeUnits: { MINUTES, MS },
+} = require('../utils');
 
 describe('predictions', () => {
   let mbta;
@@ -27,7 +29,7 @@ describe('predictions', () => {
   //   //   name: ea.attributes.long_name,
   //   //   directions: ea.attributes.direction_names,
   //   // }));
-  //   const pred = await mbta.fetchPredictions({ stop: [2056] });
+  //   const pred = await mbta.fetchPredictions({ stop: 'place-bbsta', include: 'route'});
   //   console.log(util.inspect(pred, { showHidden: false, depth: null }));
   // });
 
@@ -41,23 +43,11 @@ describe('predictions', () => {
   });
 
   it.each`
-    name                      | queryParams                    | expected
-    ${'single route'}         | ${{route: 1}}                  | ${'1'}
-    ${'single route array'}   | ${{route: [1]}}                | ${'1'}
-    ${'multi route array'}    | ${{route: [1, 'Red']}}         | ${'1,Red'}
-
-    ${'single stop'}          | ${{stop: 64}}                  | ${'64'}
-    ${'single stop array'}    | ${{stop: [64]}}                | ${'64'}
-    ${'multi stop array'}     | ${{stop: [64, 110]}}           | ${'64,110'}
-
-    ${'single trip'}          | ${{trip: 5}}                   | ${'5'}
-    ${'single trip array'}    | ${{trip: [5]}}                 | ${'5'}
-    ${'multi trip array'}     | ${{trip: [5, 22]}}             | ${'5,22'}
-
-    ${'include single'}       | ${{include: 'vehicle'}}        | ${'vehicle'}
-    ${'include single array'} | ${{include: ['stop']}}         | ${'stop'}
-    ${'include multi array'}  | ${{include: ['stop', 'trip']}} | ${'stop,trip'}
-  `(`query: $name`, async ({ queryParams, expected }) => {
+    name                      | queryParams                      | expected
+    ${'single route'}         | ${{ route: 1 }}                  | ${'1'}
+    ${'single route array'}   | ${{ route: [1] }}                | ${'1'}
+    ${'multi route array'}    | ${{ route: [1, 'Red'] }}         | ${'1,Red'}
+  `(`handles single or multiple queries: $name`, async ({ queryParams, expected }) => {
     const fetchService = jest.fn();
     mbta = new MBTA(null, fetchService);
     await mbta.fetchPredictions(queryParams);
@@ -130,7 +120,7 @@ describe('predictions', () => {
         await mbta.getFirstPage();
       } catch (err) {
         expect(err.message).toMatchInlineSnapshot(
-          `"No predictions, call fetchPredictions() before getting page links"`
+          `"No predictions, call fetchPredictions() before accessing this value"`
         );
       }
       expect(fetchService).not.toBeCalled();
