@@ -1,4 +1,4 @@
-const MBTA = require('../MBTA');
+const MBTA = require('../mbta-api');
 const includeData = require('./data/includeData');
 const {limitedPredictionData: limitData} = require('./data/predictionData');
 

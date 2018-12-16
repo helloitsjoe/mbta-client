@@ -1,7 +1,7 @@
 // const util = require('util');
 
 /* eslint-disable indent */
-const MBTA = require('../MBTA');
+const MBTA = require('../mbta-api');
 const { selectPage, Pages } = require('../predictions');
 const {
   predictionData: predictions,
@@ -27,7 +27,7 @@ describe('predictions', () => {
   //   //   name: ea.attributes.long_name,
   //   //   directions: ea.attributes.direction_names,
   //   // }));
-  //   const pred = await mbta.fetchVehicles({ limit: 4});
+  //   const pred = await mbta.fetchTrips({ limit: 3, route: 71});
   //   console.log(util.inspect(pred, { showHidden: false, depth: null }));
   // });
 
@@ -128,7 +128,9 @@ Array [
       mbta = new MBTA(null, fetchService);
       expect(mbta.arrivals()).toEqual([]);
       expect(mbta.departures()).toEqual([]);
+
       await mbta.fetchPredictions({});
+
       expect(mbta.arrivals()).toMatchInlineSnapshot(`
 Array [
   null,

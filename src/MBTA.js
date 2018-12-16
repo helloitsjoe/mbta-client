@@ -1,106 +1,58 @@
-const {
-  arrivalsWithConversion,
-  departuresWithConversion,
-  selectIncluded,
-  selectPage,
-  Pages,
-} = require('./predictions');
-const { buildUrl } = require('./utils');
-const fetchService = require('./fetchService');
+// This will create a comma separated string of multiple values,
+const BASE_URL = 'https://api-v3.mbta.com';
 
-const PREDICTIONS = '/predictions';
-const VEHICLES = '/vehicles';
-const ROUTES = '/routes';
-const STOPS = '/stops';
+// or just return a single value, whether or not it's in an array
+const commaSeparate = value => [].concat(value).join(',');
 
-/**
- * Client for the MBTA v3 API
- * https://api-v3.mbta.com
- */
-class MBTA {
-  constructor(apiKey, fetch = fetchService) {
-    this.apiKey = apiKey;
-    this.fetch = fetch;
-    // Ideally these would have a public getter and private setter
-    this.predictions = [];
-    this.vehicles = [];
-    this.routes = [];
-    this.stops = [];
+function buildUrl(endpoint, queryParams, apiKey) {
+  const url = BASE_URL + endpoint;
+
+  if (!queryParams || !Object.keys(queryParams).length) {
+    return url;
   }
 
-  async fetchPredictions(queryParams) {
-    const url = buildUrl(PREDICTIONS, this.apiKey, queryParams);
-    this.predictions = await this.fetch(url);
-    return this.predictions;
+  const { offset, limit, latitude, longitude, radius } = queryParams;
+
+  if (offset != null && limit == null) {
+    console.warn('page[offset] will have no effect without page[limit]');
   }
 
-  async fetchStops(queryParams) {
-    const url = buildUrl(STOPS, this.apiKey, queryParams);
-    this.stops = await this.fetch(url);
-    return this.stops;
+  if ((latitude != null && longitude == null) || (latitude == null && longitude != null)) {
+    console.warn('Latitude and longitude must both be present');
   }
 
-  async fetchRoutes(queryParams) {
-    const url = buildUrl(ROUTES, this.apiKey, queryParams);
-    this.routes = await this.fetch(url);
-    return this.routes;
+  if (radius != null && latitude == null) {
+    console.warn('Radius requires latitude and longitude');
   }
 
-  async fetchVehicles(queryParams) {
-    const url = buildUrl(VEHICLES, this.apiKey, queryParams);
-    this.vehicles = await this.fetch(url);
-    return this.vehicles;
+  const queryString = Object.entries(queryParams)
+    .map(([key, value]) => {
+      if (value == null) {
+        return null;
+      }
+      if (key === 'sort') {
+        return queryParams.descending ? `sort=-${value}` : `sort=${value}`;
+      }
+      if (key === 'limit' || key === 'offset') {
+        return `page[${key}]=${value}`;
+      }
+      // MBTA docs say to use filter[stop], filter[route], etc, but they
+      // also support stop, route, etc. without filter
+      return `${key}=${commaSeparate(value)}`;
+    })
+    .filter(Boolean)
+    .join('&');
+
+  if (apiKey == null) {
+    console.warn(
+      'API key is missing. Keys available at https://api-v3.mbta.com'
+    );
+    return `${url}?${queryString}`;
   }
 
-  /**
-   * Select arrival times from predictions with options to limit
-   * the number of arrivals returned, and convert them to time from now
-   */
-  arrivals({ predictions, convertTo, now } = {}) {
-    const pred = predictions || this.predictions;
-    // TODO: Maybe move predictions out of the object and curry?
-    return arrivalsWithConversion({ predictions: pred, convertTo, now });
-  }
-
-  /**
-   * Select departure times from predictions with options to limit
-   * the number of arrivals returned, and convert them to time from now
-   */
-  departures({ predictions, convertTo, now } = {}) {
-    const pred = predictions || this.predictions;
-    return departuresWithConversion({ predictions: pred, convertTo, now });
-  }
-
-  /**
-   * Select included objects by type. An array of types will return
-   * objects matching any of the specified types. Omitting 'type'
-   * will return the unfiltered 'included' array.
-   */
-  included(response, type) {
-    return selectIncluded(response, type);
-  }
-
-  // TODO: How to deal with multiple next/previous requests?
-  // Save each request to this.predictions, or require it to be passed in?
-  async getFirstPage(predictions) {
-    const url = selectPage(Pages.first, predictions);
-    return this.fetch(url);
-  }
-
-  async getNextPage(predictions) {
-    const url = selectPage(Pages.next, predictions);
-    return this.fetch(url);
-  }
-
-  async getPrevPage(predictions) {
-    const url = selectPage(Pages.prev, predictions);
-    return this.fetch(url);
-  }
-
-  async getLastPage(predictions) {
-    const url = selectPage(Pages.last, predictions);
-    return this.fetch(url);
-  }
+  return `${url}?${queryString}&api_key=${apiKey}`;
 }
 
-module.exports = MBTA;
+module.exports = {
+  buildUrl,
+};
