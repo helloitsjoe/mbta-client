@@ -2,6 +2,7 @@ const MBTA = require('../mbta-api');
 const stopsData = require('./data/stopsData');
 const tripsData = require('./data/tripsData');
 const routesData = require('./data/routesData');
+const shapesData = require('./data/shapesData');
 const vehiclesData = require('./data/vehiclesData');
 const { predictionData } = require('./data/predictionData');
 
@@ -16,6 +17,7 @@ describe('stops', () => {
     ['fetchStops', stopsData, 'stops'],
     ['fetchTrips', tripsData, 'trips'],
     ['fetchRoutes', routesData, 'routes'],
+    ['fetchShapes', shapesData, 'shapes'],
     ['fetchVehicles', vehiclesData, 'vehicles'],
     ['fetchPredictions', predictionData, 'predictions'],
   ])('%s', async (methodName, data, property) => {

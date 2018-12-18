@@ -11,6 +11,7 @@ const fetchService = require('./fetchService');
 const PREDICTIONS = '/predictions';
 const VEHICLES = '/vehicles';
 const ROUTES = '/routes';
+const SHAPES = '/shapes';
 const TRIPS = '/trips';
 const STOPS = '/stops';
 
@@ -29,6 +30,7 @@ class MBTA {
     this.predictions = [];
     this.vehicles = [];
     this.routes = [];
+    this.shapes = [];
     this.trips = [];
     this.stops = [];
   }
@@ -64,6 +66,12 @@ class MBTA {
     const url = buildUrl(VEHICLES, queryParams, this.apiKey);
     this.vehicles = await this.fetch(url);
     return this.vehicles;
+  }
+
+  async fetchShapes(queryParams) {
+    const url = buildUrl(SHAPES, queryParams, this.apiKey);
+    this.shapes = await this.fetch(url);
+    return this.shapes;
   }
 
   /**

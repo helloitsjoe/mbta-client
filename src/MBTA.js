@@ -11,7 +11,7 @@ function buildUrl(endpoint, queryParams, apiKey) {
     return url;
   }
 
-  const { offset, limit, latitude, longitude, radius } = queryParams;
+  const { offset, limit, latitude, longitude, radius, date, route } = queryParams;
 
   if (offset != null && limit == null) {
     console.warn('page[offset] will have no effect without page[limit]');
@@ -21,8 +21,16 @@ function buildUrl(endpoint, queryParams, apiKey) {
     console.warn('Latitude and longitude must both be present');
   }
 
+  if (endpoint === '/shapes' && route == null) {
+    console.warn('Shape requires a "route" query param');
+  }
+
   if (radius != null && latitude == null) {
     console.warn('Radius requires latitude and longitude');
+  }
+
+  if (typeof date !== 'string') {
+    console.warn('Date should be in ISO8601 format YYYY-MM-DD');
   }
 
   const queryString = Object.entries(queryParams)
