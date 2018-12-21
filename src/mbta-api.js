@@ -9,7 +9,9 @@ const { buildUrl } = require('./mbta');
 const fetchService = require('./fetchService');
 
 const PREDICTIONS = '/predictions';
+const SCHEDULES = '/schedules';
 const VEHICLES = '/vehicles';
+const SERVICES = '/services';
 const ROUTES = '/routes';
 const SHAPES = '/shapes';
 const TRIPS = '/trips';
@@ -28,6 +30,8 @@ class MBTA {
     this.fetch = fetch;
     // Ideally these would have a public getter and private setter
     this.predictions = [];
+    this.schedules = [];
+    this.services = [];
     this.vehicles = [];
     this.routes = [];
     this.shapes = [];
@@ -72,6 +76,18 @@ class MBTA {
     const url = buildUrl(SHAPES, queryParams, this.apiKey);
     this.shapes = await this.fetch(url);
     return this.shapes;
+  }
+
+  async fetchServices(queryParams) {
+    const url = buildUrl(SERVICES, queryParams, this.apiKey);
+    this.services = await this.fetch(url);
+    return this.services;
+  }
+
+  async fetchSchedules(queryParams) {
+    const url = buildUrl(SCHEDULES, queryParams, this.apiKey);
+    this.schedules = await this.fetch(url);
+    return this.schedules;
   }
 
   /**

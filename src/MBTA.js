@@ -11,7 +11,26 @@ function buildUrl(endpoint, queryParams, apiKey) {
     return url;
   }
 
-  const { offset, limit, latitude, longitude, radius, date, route } = queryParams;
+  const {
+    offset,
+    limit,
+    latitude,
+    longitude,
+    radius,
+    date,
+    route,
+    stop,
+    trip,
+  } = queryParams;
+
+  if ((endpoint === '/predictions' || endpoint === '/schedules')
+    && (stop == null && trip == null && route == null)) {
+    console.warn('Please include "stop", "trip", or "route" in query params');
+  }
+
+  if (endpoint === '/shapes' && route == null) {
+    console.warn('Shape requires a "route" query param');
+  }
 
   if (offset != null && limit == null) {
     console.warn('page[offset] will have no effect without page[limit]');
@@ -21,15 +40,11 @@ function buildUrl(endpoint, queryParams, apiKey) {
     console.warn('Latitude and longitude must both be present');
   }
 
-  if (endpoint === '/shapes' && route == null) {
-    console.warn('Shape requires a "route" query param');
-  }
-
-  if (radius != null && latitude == null) {
+  if (radius != null && (latitude == null || longitude == null)) {
     console.warn('Radius requires latitude and longitude');
   }
 
-  if (typeof date !== 'string') {
+  if (date != null && typeof date !== 'string') {
     console.warn('Date should be in ISO8601 format YYYY-MM-DD');
   }
 

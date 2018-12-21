@@ -27,7 +27,7 @@ describe('predictions', () => {
   //   //   name: ea.attributes.long_name,
   //   //   directions: ea.attributes.direction_names,
   //   // }));
-  //   const pred = await mbta.fetchShapes({ route: 71, limit: 2 });
+  //   const pred = await mbta.fetchSchedules({ route: 1, limit: 3 });
   //   console.log(util.inspect(pred, { showHidden: false, depth: null }));
   // });
 
