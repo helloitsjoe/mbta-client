@@ -1,35 +1,22 @@
-// const util = require('util');
-
 /* eslint-disable indent */
 const MBTA = require('../mbta-api');
-const { selectPage, Pages } = require('../predictions');
+const { selectPage, Pages } = require('../utils');
+
 const {
-  predictionData: predictions,
+  predictionData: response,
   limitedPredictionData: limitData,
 } = require('./data/predictionData');
+const includeData = require('./data/includeData');
 
 const {TimeUnits: { MINUTES, MS }} = require('../utils');
 
-describe('predictions', () => {
+describe('helper functions', () => {
   let mbta;
   const now = new Date('2018-12-05T20:21:55-05:00').valueOf();
 
   beforeEach(() => {
     mbta = new MBTA();
   });
-
-  // it.only('test live data', async () => {
-  //   // Test live data
-  //   // const routes = await mbta.fetchRoutes();
-  //   // const pred = routes.data.map(ea => ({
-  //   //   id: ea.id,
-  //   //   abbr: ea.attributes.short_name,
-  //   //   name: ea.attributes.long_name,
-  //   //   directions: ea.attributes.direction_names,
-  //   // }));
-  //   const pred = await mbta.fetchSchedules({ route: 1, limit: 3 });
-  //   console.log(util.inspect(pred, { showHidden: false, depth: null }));
-  // });
 
   it.each`
     name                      | queryParams                      | expected
@@ -45,25 +32,72 @@ describe('predictions', () => {
     expect(fetchService).toBeCalledWith(url);
   });
 
+  it.each([
+    ['getFirstPage', 0],
+    ['getNextPage', 3],
+    ['getPrevPage', 1],
+    ['getLastPage', 13],
+  ])('links: %s', async (fn, offset) => {
+    const fetchService = jest.fn();
+    mbta = new MBTA(null, fetchService);
+    await mbta[fn](limitData);
+    const url = `https://api-v3.mbta.com/predictions?filter[stop]=70080&page[limit]=1&page[offset]=${offset}`;
+    expect(fetchService).toBeCalledWith(url);
+  });
+
+  it('links throws if no predictions provided', async () => {
+    expect.assertions(2);
+    const fetchService = jest.fn();
+    mbta = new MBTA(null, fetchService);
+    try {
+      await mbta.getFirstPage();
+    } catch (err) {
+      expect(err.message).toMatchInlineSnapshot(
+        `"No response, fetch data before accessing this value"`
+      );
+    }
+    expect(fetchService).not.toBeCalled();
+  });
+
+  it('included selects by type', async () => {
+    const fetchService = jest.fn().mockResolvedValue(includeData);
+    mbta = new MBTA(null, fetchService);
+
+    const fetched = await mbta.fetchStops();
+
+    expect(mbta.included).toThrowErrorMatchingInlineSnapshot(
+      `"included() requires an MBTA response as an argument"`
+    );
+
+    expect(mbta.included(fetched)).toEqual(includeData.included);
+    expect(mbta.included(fetched, 'trip')).toEqual(
+      includeData.included.filter(({ type }) => type === 'trip')
+    );
+    expect(mbta.included(fetched, ['trip'])).toEqual(
+      includeData.included.filter(({ type }) => type === 'trip')
+    );
+    expect(mbta.included(fetched, ['trip', 'route'])).toEqual(
+      includeData.included.filter(
+        ({ type }) => type === 'trip' || type === 'route'
+      )
+    );
+  });
+
   describe('arrivals/departures', () => {
-    it('returns empty array if no predictions', () => {
+    it('returns empty array if no response', () => {
       expect(mbta.arrivals({})).toEqual([]);
       expect(mbta.departures({})).toEqual([]);
     });
 
     it('converts to minutes', () => {
-      const arrivals = mbta.arrivals({ now, predictions, convertTo: MINUTES });
-      const departures = mbta.departures({
-        now,
-        predictions,
-        convertTo: MINUTES,
-      });
+      const arrivals = mbta.arrivals({ now, response, convertTo: MINUTES });
+      const departures = mbta.departures({ now, response, convertTo: MINUTES });
       expect(arrivals).toEqual([null, 5, 6, 14, 25, 36, 48, 60]);
       expect(departures).toEqual([0, null, 6, 14, 25, 36, 48, 60]);
     });
 
     it('converts to MS', () => {
-      const arrivals = mbta.arrivals({ now, predictions, convertTo: MS });
+      const arrivals = mbta.arrivals({ now, response, convertTo: MS });
       expect(arrivals).toEqual([
         null,
         320000,
@@ -74,7 +108,7 @@ describe('predictions', () => {
         2934000,
         3654000,
       ]);
-      const departures = mbta.departures({ now, predictions, convertTo: MS });
+      const departures = mbta.departures({ now, response, convertTo: MS });
       expect(departures).toEqual([
         0,
         null,
@@ -95,7 +129,7 @@ describe('predictions', () => {
     });
 
     it('returns arrival ISO times if no convert', () => {
-      const arrivals = mbta.arrivals({ now, predictions });
+      const arrivals = mbta.arrivals({ now, response });
       expect(arrivals).toMatchInlineSnapshot(`
 Array [
   null,
@@ -108,7 +142,7 @@ Array [
   "2018-12-05T21:22:49-05:00",
 ]
 `);
-      const departures = mbta.departures({ now, predictions });
+      const departures = mbta.departures({ now, response });
       expect(departures).toMatchInlineSnapshot(`
 Array [
   "2018-12-05T20:21:55-05:00",
@@ -124,7 +158,7 @@ Array [
     });
 
     it('returns arrivals if mbta.predictions exists', async () => {
-      const fetchService = jest.fn().mockResolvedValue(predictions);
+      const fetchService = jest.fn().mockResolvedValue(response);
       mbta = new MBTA(null, fetchService);
       expect(mbta.arrivals()).toEqual([]);
       expect(mbta.departures()).toEqual([]);

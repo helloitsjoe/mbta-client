@@ -4,7 +4,7 @@ const {
   selectIncluded,
   selectPage,
   Pages,
-} = require('./predictions');
+} = require('./utils');
 const { buildUrl } = require('./mbta');
 const fetchService = require('./fetchService');
 
@@ -94,13 +94,13 @@ class MBTA {
    * Select arrival/departure times from predictions with options to limit
    * the number of arrivals returned, and convert them to time from now
    */
-  arrivals({ predictions = this.predictions, convertTo, now } = {}) {
+  arrivals({ response = this.predictions, convertTo, now } = {}) {
     // TODO: Maybe move predictions out of the object and curry?
-    return arrivalsWithConversion({ predictions, convertTo, now });
+    return arrivalsWithConversion({ response, convertTo, now });
   }
 
-  departures({ predictions = this.predictions, convertTo, now } = {}) {
-    return departuresWithConversion({ predictions, convertTo, now });
+  departures({ response = this.predictions, convertTo, now } = {}) {
+    return departuresWithConversion({ response, convertTo, now });
   }
 
   /**
@@ -114,20 +114,20 @@ class MBTA {
 
   // TODO: How to deal with multiple next/previous requests?
   // Save each request to this.predictions, or require it to be passed in?
-  async getFirstPage(predictions) {
-    return this.fetch(selectPage(Pages.first, predictions));
+  async getFirstPage(response) {
+    return this.fetch(selectPage(Pages.first, response));
   }
 
-  async getNextPage(predictions) {
-    return this.fetch(selectPage(Pages.next, predictions));
+  async getNextPage(response) {
+    return this.fetch(selectPage(Pages.next, response));
   }
 
-  async getPrevPage(predictions) {
-    return this.fetch(selectPage(Pages.prev, predictions));
+  async getPrevPage(response) {
+    return this.fetch(selectPage(Pages.prev, response));
   }
 
-  async getLastPage(predictions) {
-    const url = selectPage(Pages.last, predictions);
+  async getLastPage(response) {
+    const url = selectPage(Pages.last, response);
     return this.fetch(url);
   }
 }

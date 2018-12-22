@@ -1,6 +1,5 @@
 /* eslint-disable global-require */
 describe('MBTA', () => {
-  require('./included.test');
-  require('./predictions.test');
+  require('./helpers');
   require('./fetch.test');
 });

@@ -1,3 +1,4 @@
+// const util = require('util');
 const MBTA = require('../mbta-api');
 const stopsData = require('./data/stopsData');
 const tripsData = require('./data/tripsData');
@@ -14,6 +15,19 @@ describe('stops', () => {
   beforeEach(() => {
     mbta = new MBTA();
   });
+
+  // it.only('test live data', async () => {
+  //   // Test live data
+  //   // const routes = await mbta.fetchRoutes();
+  //   // const pred = routes.data.map(ea => ({
+  //   //   id: ea.id,
+  //   //   abbr: ea.attributes.short_name,
+  //   //   name: ea.attributes.long_name,
+  //   //   directions: ea.attributes.direction_names,
+  //   // }));
+  //   const pred = await mbta.fetchServices({ direction_id: 1 });
+  //   console.log(util.inspect(pred, { showHidden: false, depth: null }));
+  // });
 
   it.each([
     ['fetchStops', stopsData, 'stops'],
