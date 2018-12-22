@@ -25,7 +25,7 @@ describe('stops', () => {
   //   //   name: ea.attributes.long_name,
   //   //   directions: ea.attributes.direction_names,
   //   // }));
-  //   const pred = await mbta.fetchServices({ direction_id: 1 });
+  //   const pred = await mbta.fetchSchedules({ route: 71, limit: 2, stop_sequence: 'last' });
   //   console.log(util.inspect(pred, { showHidden: false, depth: null }));
   // });
 

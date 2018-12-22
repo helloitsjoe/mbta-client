@@ -17,6 +17,8 @@ const Pages = {
   last: 'last',
 };
 
+const exists = value => value != null;
+
 const convertMs = (ms, units) => {
   if (units == null) return ms;
 
@@ -99,6 +101,7 @@ module.exports = {
   Pages,
   TimeUnits,
   Attributes,
+  exists,
   convertMs,
   selectPage,
   convertTimes,

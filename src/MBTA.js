@@ -1,6 +1,11 @@
-// This will create a comma separated string of multiple values,
+/* eslint-disable camelcase */
 const BASE_URL = 'https://api-v3.mbta.com';
 
+// This will handle input as a Date(), number, or
+// string, and throw if the string is malformed.
+const normalizeDate = value => new Date(value).toISOString();
+
+// This will create a comma separated string of multiple values,
 // or just return a single value, whether or not it's in an array
 const commaSeparate = value => [].concat(value).join(',');
 
@@ -16,8 +21,9 @@ function buildUrl(endpoint, queryParams, apiKey) {
     limit,
     latitude,
     longitude,
+    min_time,
+    max_time,
     radius,
-    date,
     route,
     stop,
     trip,
@@ -44,9 +50,11 @@ function buildUrl(endpoint, queryParams, apiKey) {
     console.warn('Radius requires latitude and longitude');
   }
 
-  if (date != null && typeof date !== 'string') {
-    console.warn('Date should be in ISO8601 format YYYY-MM-DD');
-  }
+  [min_time, max_time].forEach(minMax => {
+    if (minMax != null && !/^\d{2}:\d{2}/.test(minMax)) {
+      console.warn('min_time and max_time should be in the format HH:MM');
+    }
+  });
 
   const queryString = Object.entries(queryParams)
     .map(([key, value]) => {
@@ -59,9 +67,10 @@ function buildUrl(endpoint, queryParams, apiKey) {
       if (key === 'limit' || key === 'offset') {
         return `page[${key}]=${value}`;
       }
+      const normalized = key === 'date' ? normalizeDate(value) : value;
       // MBTA docs say to use filter[stop], filter[route], etc, but they
       // also support stop, route, etc. without filter
-      return `${key}=${commaSeparate(value)}`;
+      return `${key}=${commaSeparate(normalized)}`;
     })
     .filter(Boolean)
     .join('&');
