@@ -26,7 +26,7 @@ describe('stops', () => {
   //   //   name: ea.attributes.long_name,
   //   //   directions: ea.attributes.direction_names,
   //   // }));
-  //   const pred = await mbta.fetchFacilities({ stop: 'place-brntn', limit: 3 });
+  //   const pred = await mbta.fetchStopByName('Harvard');
   //   console.log(util.inspect(pred, { showHidden: false, depth: null }));
   // });
 

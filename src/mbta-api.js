@@ -98,6 +98,34 @@ class MBTA {
     return this.facilities;
   }
 
+  async fetchAllRoutesBasic({ type } = {}) {
+    const routes = await this.fetchRoutes({ type });
+    return routes.data.map(ea => ({
+      id: ea.id,
+      abbr: ea.attributes.short_name,
+      name: ea.attributes.long_name,
+      directions: ea.attributes.direction_names,
+    }));
+  }
+
+  async fetchAllStopsByRoute(route) {
+    const stops = await this.fetchStops({ route });
+    return stops.data.map(stop => ({
+      name: stop.attributes.name,
+      id: stop.id,
+    }));
+  }
+
+  async fetchStopByName(name, { exact } = {}) {
+    const allStops = await this.fetchStops();
+    return allStops.data.filter(stop => {
+      if (exact) {
+        return stop.attributes.name === name;
+      }
+      return stop.attributes.name.match(name);
+    });
+  }
+
   /**
    * Select arrival/departure times from predictions with options to limit
    * the number of arrivals returned, and convert them to time from now

@@ -1,6 +1,6 @@
 # MTBA API Client
 
-`mbta-client` is a JavaScript client for the MTBA API v3, with a few helper functions to parse response data.
+`mbta-client` is a Node.js client library for the MTBA API v3, with a few helper functions to parse response data.
 
 ## Installation:
 
