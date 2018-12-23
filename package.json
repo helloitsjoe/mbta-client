@@ -1,7 +1,7 @@
 {
   "name": "mbta-client",
   "version": "0.1.3",
-  "description": "MBTA API JavaScript client",
+  "description": "MBTA API v3 JavaScript client",
   "main": "index.js",
   "scripts": {
     "test": "jest --testPathPattern=__tests__/index.test.js",
@@ -24,6 +24,9 @@
   "bugs": {
     "url": "https://github.com/helloitsjoe/mbta-client/issues"
   },
+  "files": [
+    "/src"
+  ],
   "homepage": "https://github.com/helloitsjoe/mbta-client#readme",
   "dependencies": {
     "axios": "^0.18.0"

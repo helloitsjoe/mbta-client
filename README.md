@@ -1,6 +1,6 @@
 # MTBA API Client
 
-`mbta-client` is a JavaScript client for MTBA API v3, with a few helper functions to parse response data.
+`mbta-client` is a JavaScript client for the MTBA API v3, with a few helper functions to parse response data.
 
 ## Installation:
 
@@ -36,6 +36,7 @@ You can include arrays of filters for combined results:
 ```js
 // Returns combined predictions for bus route 1 and the red line
 const predictions = await mbta.fetchPredictions({ route: [1, 'Red'] });
+
 // Returns combined predictions for stop 70080 and Back Bay commuter rail
 const predictions = await mbta.fetchPredictions({ stop: [70080, 'Back Bay'] });
 ```
@@ -79,6 +80,45 @@ const nextNextPageResults = await mbta.getNextPage(nextPageResults);
 // Get first or last page from any result
 const firstPageResults = await mbta.getFirstPage(predictions);
 const lastPageResults = await mbta.getLastPage(predictions);
+```
+
+## API
+
+### Fetch functions:
+```ts
+mbta.fetchPredictions(options);
+
+// options
+{
+  route: string | number | string[] | number[];
+  trip: string | number | string[] | number[];
+  stop: string | number | string[] | number[];
+  ...
+}
+```
+
+### Helper functions:
+
+```ts
+mbta.arrivals(options);
+mbta.departures(options);
+
+// options
+{
+  response: MBTAResponse ;// Optional if predictions previously fetched
+  convertTo: 'MS' | 'SECONDS' | 'MINUTES' | 'HOURS';
+}
+```
+
+```ts
+mbta.included(response: MBTAResponse, type?: string | string[]);
+```
+
+```ts
+mbta.getFirstPage(response: MBTAResponse); // Response must include 'links'
+mbta.getLastPage(response: MBTAResponse); // Response must include 'links'
+mbta.getNextPage(response: MBTAResponse); // Response must include 'links'
+mbta.getPrevPage(response: MBTAResponse); // Response must include 'links'
 ```
 
 MBTA API Documentation: https://api-v3.mbta.com/docs/swagger/index.html
