@@ -7,6 +7,7 @@ const shapesData = require('./data/shapesData');
 const servicesData = require('./data/servicesData');
 const vehiclesData = require('./data/vehiclesData');
 const schedulesData = require('./data/schedulesData');
+const facilitiesData = require('./data/facilitiesData');
 const { predictionData } = require('./data/predictionData');
 
 describe('stops', () => {
@@ -25,7 +26,7 @@ describe('stops', () => {
   //   //   name: ea.attributes.long_name,
   //   //   directions: ea.attributes.direction_names,
   //   // }));
-  //   const pred = await mbta.fetchSchedules({ route: 71, limit: 2, stop_sequence: 'last' });
+  //   const pred = await mbta.fetchFacilities({ stop: 'place-brntn', limit: 3 });
   //   console.log(util.inspect(pred, { showHidden: false, depth: null }));
   // });
 
@@ -37,6 +38,7 @@ describe('stops', () => {
     ['fetchVehicles', vehiclesData, 'vehicles'],
     ['fetchServices', servicesData, 'services'],
     ['fetchSchedules', schedulesData, 'schedules'],
+    ['fetchFacilities', facilitiesData, 'facilities'],
     ['fetchPredictions', predictionData, 'predictions'],
   ])('%s', async (methodName, data, property) => {
     const fetchService = jest.fn().mockResolvedValue(data);
