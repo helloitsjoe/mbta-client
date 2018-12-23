@@ -9,6 +9,7 @@ const { buildUrl } = require('./mbta');
 const fetchService = require('./fetchService');
 
 const PREDICTIONS = '/predictions';
+const FACILITIES = '/facilities';
 const SCHEDULES = '/schedules';
 const VEHICLES = '/vehicles';
 const SERVICES = '/services';
@@ -29,6 +30,7 @@ class MBTA {
     this.apiKey = apiKey;
     this.fetch = fetch;
     // Ideally these would have a public getter and private setter
+    this.facilities = [];
     this.predictions = [];
     this.schedules = [];
     this.services = [];
@@ -90,6 +92,12 @@ class MBTA {
     return this.schedules;
   }
 
+  async fetchFacilities(queryParams) {
+    const url = buildUrl(FACILITIES, queryParams, this.apiKey);
+    this.facilities = await this.fetch(url);
+    return this.facilities;
+  }
+
   /**
    * Select arrival/departure times from predictions with options to limit
    * the number of arrivals returned, and convert them to time from now
@@ -127,8 +135,7 @@ class MBTA {
   }
 
   async getLastPage(response) {
-    const url = selectPage(Pages.last, response);
-    return this.fetch(url);
+    return this.fetch(selectPage(Pages.last, response));
   }
 }
 

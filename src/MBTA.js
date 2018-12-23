@@ -1,3 +1,5 @@
+const {exists} = require('./utils');
+
 /* eslint-disable camelcase */
 const BASE_URL = 'https://api-v3.mbta.com';
 
@@ -29,36 +31,38 @@ function buildUrl(endpoint, queryParams, apiKey) {
     trip,
   } = queryParams;
 
-  if ((endpoint === '/predictions' || endpoint === '/schedules')
-    && (stop == null && trip == null && route == null)) {
+  const matchRoute = test => test === endpoint;
+
+  if ((matchRoute('/predictions') || matchRoute('/schedules'))
+    && (!exists(stop) && !exists(trip) && !exists(route))) {
     console.warn('Please include "stop", "trip", or "route" in query params');
   }
 
-  if (endpoint === '/shapes' && route == null) {
+  if (matchRoute('/shapes') && !exists(route)) {
     console.warn('Shape requires a "route" query param');
   }
 
-  if (offset != null && limit == null) {
+  if (exists(offset) && !exists(limit)) {
     console.warn('page[offset] will have no effect without page[limit]');
   }
 
-  if ((latitude != null && longitude == null) || (latitude == null && longitude != null)) {
+  if ((exists(latitude) && !exists(longitude)) || (!exists(latitude) && exists(longitude))) {
     console.warn('Latitude and longitude must both be present');
   }
 
-  if (radius != null && (latitude == null || longitude == null)) {
+  if (exists(radius) && (!exists(latitude) || !exists(longitude))) {
     console.warn('Radius requires latitude and longitude');
   }
 
   [min_time, max_time].forEach(minMax => {
-    if (minMax != null && !/^\d{2}:\d{2}/.test(minMax)) {
+    if (exists(minMax) && !/^\d{2}:\d{2}/.test(minMax)) {
       console.warn('min_time and max_time should be in the format HH:MM');
     }
   });
 
   const queryString = Object.entries(queryParams)
     .map(([key, value]) => {
-      if (value == null) {
+      if (!exists(value)) {
         return null;
       }
       if (key === 'sort') {
@@ -75,7 +79,7 @@ function buildUrl(endpoint, queryParams, apiKey) {
     .filter(Boolean)
     .join('&');
 
-  if (apiKey == null) {
+  if (!exists(apiKey)) {
     console.warn(
       'API key is missing. Keys available at https://api-v3.mbta.com'
     );
