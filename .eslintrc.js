@@ -10,6 +10,6 @@ module.exports = {
         'object-curly-spacing': 'off',
         'class-methods-use-this': 'off',
         'arrow-parens': ['error', 'as-needed'],
-        'comma-dangle': ['error', 'always-multiline']
+        'comma-dangle': ['error', 'only-multiline']
     }
 };
