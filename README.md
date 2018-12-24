@@ -57,8 +57,8 @@ const sorted = mbta.fetchPredictions({
 // Arrival and departure helpers have the same API/options.
 // By default, returns an array of arrival times in ISO8601 format
 const arrivals = mbta.selectArrivals(response);
-// Provide `convertTo` option to convert to MINUTES, SECONDS, MS, or HOURS until arrival
-const departures = mbta.selectselectDepartures(response, { convertTo: mbta.constants.MINUTES });
+// Provide `convertTo` option to convert to time until arrival (ms, seconds, minutes, or hours)
+const departures = mbta.selectselectDepartures(response, { convertTo: 'minutes' });
 ```
 
 #### Pagination
@@ -82,7 +82,7 @@ const lastPageResults = await mbta.getLastPage(predictions);
 ### Fetch functions (return a promise):
 
 These map to the endpoints listed at https://api-v3.mbta.com/docs/swagger/index.html. They return a promise that resolves to an MBTA response object. `options` for each function maps to the filters listed on that page. `options` that accept multiple values can be provided as an array or comma separated string.
-```ts
+```js
 mbta.fetchStops(options);
 mbta.fetchTrips(options);
 mbta.fetchRoutes(options);
@@ -97,17 +97,20 @@ mbta.fetchPredictions(options);
 ### Helper functions:
 
 ```ts
-mbta.selectArrivals(response: MBTAResponse; {
-  // TODO: Make this robust to human input instead of `timeConstants`
-  convertTo: mbta.timeConstants; // MS | SECONDS | MINUTES | HOURS
-});
-mbta.selectDepartures(response, options); // Same options as arrivals
+mbta.selectArrivals(response: MBTAResponse, options?: ArriveDepartOptions);
+mbta.selectDepartures(response: MBTAResponse, options?: ArriveDepartOptions);
+
+type ArriveDepartOptions: { convertTo?: string }; // 'ms', 'seconds', 'minutes', 'hours'
 ```
+_Note: `arrival_time` could be null if it's the first stop on a route. If `departure_time` is not null, the MBTA recommends using that instead. Departure could be null if it's the final stop on a route. See https://www.mbta.com/developers/v3-api/best-practices for more info._
+
 
 ```ts
-mbta.selectIncluded(response: MBTAResponse, {
-  type?: string | string[],
-});
+mbta.selectIncluded(response: MBTAResponse, options?: TypeOptions);
+
+// See the MBTA API docs for `include_value`s for each endpoint
+// https://api-v3.mbta.com/docs/swagger/index.html
+type TypeOptions: { type?: include_value | include_value[] };
 ```
 
 ## Pagination helpers (return a promise):
