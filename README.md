@@ -1,6 +1,6 @@
 # MTBA API Client
 
-`mbta-client` is a Node.js client library for the MTBA API v3, with a few helper functions to parse response data.
+`mbta-client` is a promise-based Node.js client library for the MTBA API v3, with a few helper functions to parse response data.
 
 ## Installation:
 
@@ -84,41 +84,47 @@ const lastPageResults = await mbta.getLastPage(predictions);
 
 ## API
 
-### Fetch functions:
+### Fetch functions (return a promise):
 ```ts
 mbta.fetchPredictions(options);
-
-// options
-{
-  route: string | number | string[] | number[];
-  trip: string | number | string[] | number[];
-  stop: string | number | string[] | number[];
-  ...
-}
+mbta.fetchStops(options);
+mbta.fetchTrips(options);
+mbta.fetchRoutes(options);
+mbta.fetchVehicles(options);
+mbta.fetchShapes(options);
+mbta.fetchServices(options);
+mbta.fetchSchedules(options);
+mbta.fetchFacilities(options);
 ```
+`options` for each endpoint map to the filters listed at https://api-v3.mbta.com/docs/swagger/index.html.
+`options` that accept multiple values can be provided as an array or comma separated string.
+`route_type` can be provided as a [route_type code](https://developers.google.com/transit/gtfs/reference/routes-file) or a string, e.g. `bus`, `subway`, `commuter rail`.
+
 
 ### Helper functions:
 
 ```ts
-mbta.arrivals(options);
-mbta.departures(options);
-
-// options
-{
-  response: MBTAResponse ;// Optional if predictions previously fetched
+mbta.arrivals({
+  response: MBTAResponse;
   convertTo: 'MS' | 'SECONDS' | 'MINUTES' | 'HOURS';
-}
+});
+mbta.departures(options); // Same options as arrivals
 ```
 
 ```ts
-mbta.included(response: MBTAResponse, type?: string | string[]);
+mbta.included({
+  response: MBTAResponse,
+  type?: string | string[],
+});
 ```
 
+## Pagination helpers (return a promise):
+_Note: Response input must include links._
 ```ts
-mbta.getFirstPage(response: MBTAResponse); // Response must include 'links'
-mbta.getLastPage(response: MBTAResponse); // Response must include 'links'
-mbta.getNextPage(response: MBTAResponse); // Response must include 'links'
-mbta.getPrevPage(response: MBTAResponse); // Response must include 'links'
+mbta.fetchFirstPage(response: MBTAResponse);
+mbta.fetchLastPage(response: MBTAResponse);
+mbta.fetchNextPage(response: MBTAResponse);
+mbta.fetchPrevPage(response: MBTAResponse);
 ```
 
 MBTA API Documentation: https://api-v3.mbta.com/docs/swagger/index.html
