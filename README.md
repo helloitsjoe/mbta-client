@@ -35,14 +35,14 @@ const busRoutes = await mbta.fetchRoutes({ route_type: ['trolley', 'subway'] });
 // `direction_id` corresponds to the index of the `route`'s `direction_names` attribute.
 // Example: The red line's `direction_names` are `['Southbound', 'Northbound']`,
 // so to return only Northbound results, include `direction_id: 1` in your query.
-const predictions = await mbta.fetchPredictions({ stop: 'place-sstat', direction_id: 1 });
+const northbound = await mbta.fetchPredictions({ stop: 'place-sstat', direction_id: 1 });
 
 // Get results based on `latitude`/`longitude`, optionally providing a radius
-const predictions = await mbta.fetchPredictions({ latitude: 42.373, longitude: -71.119 });
+const local = await mbta.fetchPredictions({ latitude: 42.373, longitude: -71.119 });
 
 // You can sort by `arrival_time`, `departure_time`, etc. (See the MBTA docs for
 // each endpoint's sort options). Reverse the sort order with { descending: true }.
-const predictions = mbta.fetchPredictions({
+const sorted = mbta.fetchPredictions({
   stop: 42,
   sort: 'arrival_time',
   descending: true,
@@ -81,7 +81,7 @@ const lastPageResults = await mbta.getLastPage(predictions);
 
 ### Fetch functions (return a promise):
 
-These map to the endpoints listed at https://api-v3.mbta.com/docs/swagger/index.html. `options` for each function maps to the filters listed on that page. `options` that accept multiple values can be provided as an array or comma separated string.
+These map to the endpoints listed at https://api-v3.mbta.com/docs/swagger/index.html. They return a promise that resolves to an MBTA response object. `options` for each function maps to the filters listed on that page. `options` that accept multiple values can be provided as an array or comma separated string.
 ```ts
 mbta.fetchStops(options);
 mbta.fetchTrips(options);
