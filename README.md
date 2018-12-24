@@ -8,69 +8,59 @@
 npm i mbta-client
 ```
 
-## Importing
-
-```js
-import MBTA from 'mbta-client';
-```
-
 ## Basic Usage
 
-Instantiate MBTA with your API key
+### Fetch functions:
 
 ```js
 import MBTA from 'mbta-client';
 
+// Instantiate MBTA with your API key
 const mbta = new MBTA(YOUR_API_KEY);
-```
 
-Fetch predictions, providing at least one filter (`stop`, `route`, or `trip`);
-
-```js
+// Fetch data, passing in filters as options. The MBTA site has documentation
+// on filters for each method https://api-v3.mbta.com/docs/swagger/index.html#/
 const predictions = await mbta.fetchPredictions({ stop: 42 });
-const arrivals = mbta.arrivals({ predictions });
-```
 
-You can include arrays of filters for combined results:
+// Filters that accept multiple values can be provided as an array or
+// comma separated string, and will return the combined info
+const stops = await mbta.fetchStops({ id: [70080, 'Back Bay'] });
 
-```js
-// Returns combined predictions for bus route 1 and the red line
-const predictions = await mbta.fetchPredictions({ route: [1, 'Red'] });
-
-// Returns combined predictions for stop 70080 and Back Bay commuter rail
-const predictions = await mbta.fetchPredictions({ stop: [70080, 'Back Bay'] });
-```
-
-Filter by `direction_id` to only get results going in one direction.
-`direction_id` corresponds to the index of the `route`'s `direction_names` attribute.
-Example: The red line's `direction_names` are `['Southbound', 'Northbound']`, so to return
-only Northbound results, include `direction_id: 1` in your query.
-
-```js
+// Filter by `direction_id` to only get results going in one direction.
+// `direction_id` corresponds to the index of the `route`'s `direction_names` attribute.
+// Example: The red line's `direction_names` are `['Southbound', 'Northbound']`,
+// so to return only Northbound results, include `direction_id: 1` in your query.
 const predictions = await mbta.fetchPredictions({ stop: 'place-sstat', direction_id: 1 });
-```
 
-Get results based on `latitude`/`longitude`, optionally providing a radius
-
-```js
+// Get results based on `latitude`/`longitude`, optionally providing a radius
 const predictions = await mbta.fetchPredictions({ latitude: 42.373, longitude: -71.119 });
-```
 
-You can limit the number of results, sort by `arrival_time`, `departure_time`, etc., and reverse the sort order with `descending: true`.
-
-```js
+// You can sort by `arrival_time`, `departure_time`, etc. (See the MBTA docs for
+// each endpoint's sort options). Reverse the sort order with { descending: true }.
 const predictions = mbta.fetchPredictions({
   stop: 42,
-  limit: 4, // Truncate the number of results
-  sort: 'arrival_time', // Sort by `arrival_time`, `departure_time`, etc.
-  descending: true, // Set `descending` to true to reverse the sort order.
+  sort: 'arrival_time',
+  descending: true,
 });
-const arrivals = mbta.arrivals({ convertTo: 'MINUTES' });
 ```
 
-If you need paginated results, provide a `limit` and optional `offset` with the request. Helper functions will return the first, next, previous and last pages.
+### Helper functions:
+
+#### `selectArrivals`/`selectDepartures`
 
 ```js
+// By default, returns an array of arrival times in ISO8601 format
+const arrivals = mbta.selectArrivals(response);
+// Provide `convertTo` option to convert to MINUTES, SECONDS, MS, or HOURS until arrival
+const departures = mbta.selectselectDepartures(response, { convertTo: mbta.constants.MINUTES });
+
+```
+
+#### Pagination
+
+```js
+// If you need paginated results, provide a `limit` and optional `offset` with the
+// request. Helper functions will return the first, next, previous and last pages.
 const predictions = await mbta.fetchPredictions({ stop: 42, limit: 2 });
 
 // Use the result to get the next page
@@ -100,25 +90,23 @@ mbta.fetchFacilities(options);
 `options` that accept multiple values can be provided as an array or comma separated string.
 `route_type` can be provided as a [route_type code](https://developers.google.com/transit/gtfs/reference/routes-file) or a string, e.g. `bus`, `subway`, `commuter rail`.
 
-
 ### Helper functions:
 
 ```ts
-mbta.arrivals({
-  response: MBTAResponse;
-  convertTo: 'MS' | 'SECONDS' | 'MINUTES' | 'HOURS';
+mbta.selectArrivals(response: MBTAResponse; {
+  convertTo: mbta.timeConstants; // MS | SECONDS | MINUTES | HOURS
 });
-mbta.departures(options); // Same options as arrivals
+mbta.selectDepartures(response, options); // Same options as arrivals
 ```
 
 ```ts
-mbta.included({
-  response: MBTAResponse,
+mbta.selectIncluded(response: MBTAResponse, {
   type?: string | string[],
 });
 ```
 
 ## Pagination helpers (return a promise):
+
 _Note: Response input must include links._
 ```ts
 mbta.fetchFirstPage(response: MBTAResponse);
