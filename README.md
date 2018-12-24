@@ -26,6 +26,11 @@ const predictions = await mbta.fetchPredictions({ stop: 42 });
 // comma separated string, and will return the combined info
 const stops = await mbta.fetchStops({ id: [70080, 'Back Bay'] });
 
+// Some fetch functions accept a `route_type` filter, which can be provided as a
+// route_type code: https://developers.google.com/transit/gtfs/reference/routes-file
+// or a string: `bus`, `subway`, `commuter rail`, etc.
+const busRoutes = await mbta.fetchRoutes({ route_type: ['trolley', 'subway'] });
+
 // Filter by `direction_id` to only get results going in one direction.
 // `direction_id` corresponds to the index of the `route`'s `direction_names` attribute.
 // Example: The red line's `direction_names` are `['Southbound', 'Northbound']`,
@@ -46,14 +51,14 @@ const predictions = mbta.fetchPredictions({
 
 ### Helper functions:
 
-#### `selectArrivals`/`selectDepartures`
+#### Arrivals/Departures
 
 ```js
+// Arrival and departure helpers have the same API/options.
 // By default, returns an array of arrival times in ISO8601 format
 const arrivals = mbta.selectArrivals(response);
 // Provide `convertTo` option to convert to MINUTES, SECONDS, MS, or HOURS until arrival
 const departures = mbta.selectselectDepartures(response, { convertTo: mbta.constants.MINUTES });
-
 ```
 
 #### Pagination
@@ -75,25 +80,25 @@ const lastPageResults = await mbta.getLastPage(predictions);
 ## API
 
 ### Fetch functions (return a promise):
+
+These map to the endpoints listed at https://api-v3.mbta.com/docs/swagger/index.html. `options` for each function maps to the filters listed on that page. `options` that accept multiple values can be provided as an array or comma separated string.
 ```ts
-mbta.fetchPredictions(options);
 mbta.fetchStops(options);
 mbta.fetchTrips(options);
 mbta.fetchRoutes(options);
-mbta.fetchVehicles(options);
 mbta.fetchShapes(options);
+mbta.fetchVehicles(options);
 mbta.fetchServices(options);
 mbta.fetchSchedules(options);
 mbta.fetchFacilities(options);
+mbta.fetchPredictions(options);
 ```
-`options` for each endpoint map to the filters listed at https://api-v3.mbta.com/docs/swagger/index.html.
-`options` that accept multiple values can be provided as an array or comma separated string.
-`route_type` can be provided as a [route_type code](https://developers.google.com/transit/gtfs/reference/routes-file) or a string, e.g. `bus`, `subway`, `commuter rail`.
 
 ### Helper functions:
 
 ```ts
 mbta.selectArrivals(response: MBTAResponse; {
+  // TODO: Make this robust to human input instead of `timeConstants`
   convertTo: mbta.timeConstants; // MS | SECONDS | MINUTES | HOURS
 });
 mbta.selectDepartures(response, options); // Same options as arrivals
@@ -107,7 +112,7 @@ mbta.selectIncluded(response: MBTAResponse, {
 
 ## Pagination helpers (return a promise):
 
-_Note: Response input must include links._
+_Note: Response input must include `links` property._
 ```ts
 mbta.fetchFirstPage(response: MBTAResponse);
 mbta.fetchLastPage(response: MBTAResponse);
