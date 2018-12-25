@@ -15,11 +15,10 @@
   },
   "keywords": [
     "mbta",
-    "public",
     "transit",
+    "transportation",
     "subway",
-    "bus",
-    "javascript"
+    "bus"
   ],
   "author": "Joe Boyle",
   "license": "MIT",
