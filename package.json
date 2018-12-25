@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --testPathPattern=__tests__/index.test.js",
-    "lint": "eslint --fix-dry-run"
+    "lint": "eslint --fix-dry-run",
+    "watch": "webpack --watch",
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
@@ -20,12 +22,12 @@
     "javascript"
   ],
   "author": "Joe Boyle",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/helloitsjoe/mbta-client/issues"
   },
   "files": [
-    "/src"
+    "/lib"
   ],
   "homepage": "https://github.com/helloitsjoe/mbta-client#readme",
   "dependencies": {
@@ -39,6 +41,8 @@
     "eslint-plugin-react": "^7.11.1",
     "eslint-plugin-standard": "^4.0.0",
     "jest": "^23.6.0",
-    "prettier": "^1.15.3"
+    "prettier": "^1.15.3",
+    "webpack": "^4.28.2",
+    "webpack-cli": "^3.1.2"
   }
 }

@@ -137,3 +137,7 @@ mbta.fetchPrevPage(response: MBTAResponse);
 MBTA API Documentation: https://api-v3.mbta.com/docs/swagger/index.html
 
 MBTA API Best Practices: https://www.mbta.com/developers/v3-api/best-practices
+
+## License
+
+MIT
