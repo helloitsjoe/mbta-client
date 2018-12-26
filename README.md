@@ -60,34 +60,35 @@ const sorted = mbta.fetchPredictions({
 
 ```js
 // By default, returns an array of arrival times in ISO8601 format
-const arrivals = mbta.selectArrivals(response);
+const arr = mbta.selectArrivals(response);
 // `convertTo` returns time left in ms, seconds, minutes, hours
-const departures = mbta.selectselectDepartures(response, {
-  convertTo: 'minutes',
-});
+const dep = mbta.selectDepartures(response, { convertTo: 'minutes' });
 ```
 
-_Arrival and departure helpers have the same API/options._
+_Note: arrival and departure helpers have the same API/options._
 
 #### Pagination
 
+Helper functions fetch the first, next, previous and last pages.
+
 ```js
 // For paginated results, provide `limit` and optional `offset`
-const predictions = await mbta.fetchPredictions({ stop: 42, limit: 2 });
+const results = await mbta.fetchPredictions({ stop: 42, limit: 2 });
 
-// Helper functions fetch the first, next, previous and last pages.
 // Use the result to get the next page
-const nextPageResults = await mbta.getNextPage(predictions);
+const secondPageResults = await mbta.getNextPage(results);
 // Use the next page result to get the page after that
-const nextNextPageResults = await mbta.getNextPage(nextPageResults);
+const thirdPageResults = await mbta.getNextPage(secondPageResults);
 // Get first or last page from any result
-const firstPageResults = await mbta.getFirstPage(predictions);
-const lastPageResults = await mbta.getLastPage(predictions);
+const firstPageResults = await mbta.getFirstPage(results);
+const lastPageResults = await mbta.getLastPage(results);
 ```
 
 ## API
 
-### Fetch functions (return a promise):
+### Fetch functions:
+
+(Return a promise that resolves to an MBTA response object)
 
 These map to the endpoints listed at https://api-v3.mbta.com/docs/swagger/index.html. They return a promise that resolves to an MBTA response object. `options` for each function maps to the filters listed on that page. `options` that accept multiple values can be provided as an array or comma separated string.
 
@@ -101,6 +102,7 @@ mbta.fetchServices(options);
 mbta.fetchSchedules(options);
 mbta.fetchFacilities(options);
 mbta.fetchPredictions(options);
+// mbta.fetchAlerts(options) COMING SOON
 ```
 
 ### Helper functions:
@@ -109,7 +111,7 @@ mbta.fetchPredictions(options);
 mbta.selectArrivals(response: MBTAResponse, options?: ConvertOptions);
 mbta.selectDepartures(response: MBTAResponse, options?: ConvertOptions);
 
-type ConvertOptions = { convertTo?: string }; // 'ms', 'seconds', 'minutes', 'hours'
+type ConvertOptions = { convertTo?: 'ms' | 'seconds' | 'minutes' | 'hours' };
 ```
 
 _Note: `arrival_time` could be null if it's the first stop on a route. If `departure_time` is not null, the MBTA recommends using that instead. Departure could be null if it's the final stop on a route. See https://www.mbta.com/developers/v3-api/best-practices for more info._
@@ -124,7 +126,9 @@ type TypeOptions = { type?: include_value | include_value[] };
 
 ## Pagination helpers (return a promise):
 
-_Note: Response input must include `links` property._
+(Return a promise that resolves to an MBTA response object)
+
+_Note: Input must include `links` property._
 
 ```ts
 mbta.fetchFirstPage(response: MBTAResponse);
