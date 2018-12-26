@@ -88,7 +88,7 @@ const lastPageResults = await mbta.getLastPage(results);
 
 ### Fetch functions:
 
-(Return a promise that resolves to an MBTA response object)
+(These return a promise that resolves to an MBTA response object)
 
 These map to the endpoints listed at https://api-v3.mbta.com/docs/swagger/index.html. They return a promise that resolves to an MBTA response object. `options` for each function maps to the filters listed on that page. `options` that accept multiple values can be provided as an array or comma separated string.
 
@@ -124,9 +124,9 @@ mbta.selectIncluded(response: MBTAResponse, options?: TypeOptions);
 type TypeOptions = { type?: include_value | include_value[] };
 ```
 
-## Pagination helpers (return a promise):
+## Pagination helpers:
 
-(Return a promise that resolves to an MBTA response object)
+(These return a promise that resolves to an MBTA response object)
 
 _Note: Input must include `links` property._
 
