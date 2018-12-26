@@ -1,3 +1,3 @@
-const MBTA = require('./lib/mbta-api');
+const MBTA = require('./lib/mbta');
 
 module.exports = MBTA;

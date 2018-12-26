@@ -108,10 +108,10 @@ mbta.fetchPredictions(options);
 ### Helper functions:
 
 ```ts
-mbta.selectArrivals(response: MBTAResponse, options?: ConvertOptions);
-mbta.selectDepartures(response: MBTAResponse, options?: ConvertOptions);
+mbta.selectArrivals(response: MBTAResponse, options?: TimeOptions);
+mbta.selectDepartures(response: MBTAResponse, options?: TimeOptions);
 
-type ConvertOptions = { convertTo?: 'ms' | 'seconds' | 'minutes' | 'hours' };
+type TimeOptions = { convertTo?: 'ms' | 'seconds' | 'minutes' | 'hours' };
 ```
 
 _Note: `arrival_time` could be null if it's the first stop on a route. If `departure_time` is not null, the MBTA recommends using that instead. Departure could be null if it's the final stop on a route. See https://www.mbta.com/developers/v3-api/best-practices for more info._

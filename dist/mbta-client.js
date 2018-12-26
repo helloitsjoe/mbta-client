@@ -91,10 +91,24 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./lib/index.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./index.js");
 /******/ })
 /************************************************************************/
 /******/ ({
+
+/***/ "./index.js":
+/*!******************!*\
+  !*** ./index.js ***!
+  \******************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+const MBTA = __webpack_require__(/*! ./lib/mbta */ "./lib/mbta.js");
+
+module.exports = MBTA;
+
+
+/***/ }),
 
 /***/ "./lib/constants.js":
 /*!**************************!*\
@@ -155,47 +169,18 @@ module.exports = fetchService;
 
 /***/ }),
 
-/***/ "./lib/index.js":
-/*!**********************!*\
-  !*** ./lib/index.js ***!
-  \**********************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-const MBTA = __webpack_require__(/*! ./mbta-api */ "./lib/mbta-api.js");
-
-module.exports = MBTA;
-
-
-/***/ }),
-
-/***/ "./lib/mbta-api.js":
-/*!*************************!*\
-  !*** ./lib/mbta-api.js ***!
-  \*************************/
+/***/ "./lib/mbta.js":
+/*!*********************!*\
+  !*** ./lib/mbta.js ***!
+  \*********************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* eslint-disable camelcase */
-const {
-  arrivalsWithConversion,
-  departuresWithConversion,
-  selectIncluded,
-  selectPage,
-} = __webpack_require__(/*! ./utils */ "./lib/utils.js");
-const { buildUrl } = __webpack_require__(/*! ./mbta */ "./lib/mbta.js");
+const { buildUrl, arrivalsWithConversion, departuresWithConversion } = __webpack_require__(/*! ./utils */ "./lib/utils.js");
+const { selectPage, selectIncluded } = __webpack_require__(/*! ./selectors */ "./lib/selectors.js");
 const fetchService = __webpack_require__(/*! ./fetchService */ "./lib/fetchService.js");
-const { TimeUnits, Pagination } = __webpack_require__(/*! ./constants */ "./lib/constants.js");
-
-const PREDICTIONS = '/predictions';
-const FACILITIES = '/facilities';
-const SCHEDULES = '/schedules';
-const VEHICLES = '/vehicles';
-const SERVICES = '/services';
-const ROUTES = '/routes';
-const SHAPES = '/shapes';
-const TRIPS = '/trips';
-const STOPS = '/stops';
+const { Pagination } = __webpack_require__(/*! ./constants */ "./lib/constants.js");
 
 // TODO: filterByAttribute
 // TODO: filterByRelationship
@@ -208,57 +193,45 @@ class MBTA {
   constructor(apiKey, fetch = fetchService) {
     this.apiKey = apiKey;
     this.fetch = fetch;
-
-    // Expose these publicly so devs don't have to use strings:
-    this.timeConstants = TimeUnits;
   }
 
   /**
    * Fetch functions
    */
   async fetchPredictions(queryParams) {
-    const url = buildUrl(PREDICTIONS, queryParams, this.apiKey);
-    return this.fetch(url);
+    return this.fetch(buildUrl('/predictions', queryParams, this.apiKey));
   }
 
   async fetchStops(queryParams) {
-    const url = buildUrl(STOPS, queryParams, this.apiKey);
-    return this.fetch(url);
+    return this.fetch(buildUrl('/stops', queryParams, this.apiKey));
   }
 
   async fetchTrips(queryParams) {
-    const url = buildUrl(TRIPS, queryParams, this.apiKey);
-    return this.fetch(url);
+    return this.fetch(buildUrl('/trips', queryParams, this.apiKey));
   }
 
   async fetchRoutes(queryParams) {
-    const url = buildUrl(ROUTES, queryParams, this.apiKey);
-    return this.fetch(url);
+    return this.fetch(buildUrl('/routes', queryParams, this.apiKey));
   }
 
   async fetchVehicles(queryParams) {
-    const url = buildUrl(VEHICLES, queryParams, this.apiKey);
-    return this.fetch(url);
+    return this.fetch(buildUrl('/vehicles', queryParams, this.apiKey));
   }
 
   async fetchShapes(queryParams) {
-    const url = buildUrl(SHAPES, queryParams, this.apiKey);
-    return this.fetch(url);
+    return this.fetch(buildUrl('/shapes', queryParams, this.apiKey));
   }
 
   async fetchServices(queryParams) {
-    const url = buildUrl(SERVICES, queryParams, this.apiKey);
-    return this.fetch(url);
+    return this.fetch(buildUrl('/services', queryParams, this.apiKey));
   }
 
   async fetchSchedules(queryParams) {
-    const url = buildUrl(SCHEDULES, queryParams, this.apiKey);
-    return this.fetch(url);
+    return this.fetch(buildUrl('/schedules', queryParams, this.apiKey));
   }
 
   async fetchFacilities(queryParams) {
-    const url = buildUrl(FACILITIES, queryParams, this.apiKey);
-    return this.fetch(url);
+    return this.fetch(buildUrl('/facilities', queryParams, this.apiKey));
   }
 
   // async fetchAllRoutesBasic({ type } = {}) {
@@ -336,32 +309,158 @@ module.exports = MBTA;
 
 /***/ }),
 
-/***/ "./lib/mbta.js":
-/*!*********************!*\
-  !*** ./lib/mbta.js ***!
-  \*********************/
+/***/ "./lib/selectors.js":
+/*!**************************!*\
+  !*** ./lib/selectors.js ***!
+  \**************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-const { exists, isEmptyArray } = __webpack_require__(/*! ./utils */ "./lib/utils.js");
+const { Attributes } = __webpack_require__(/*! ./constants */ "./lib/constants.js");
+
+const selectAttribute = attr => response => {
+  if (!response || !response.data) {
+    console.warn('No response data...');
+    return [];
+  }
+
+  return response.data.map(vehicle => vehicle.attributes[attr]);
+};
+
+const selectLinks = response => {
+  if (!response) {
+    throw new Error('No response, fetch data before accessing this value');
+  }
+  if (!response.links) {
+    console.warn('response.links does not exist, "limit" must be in fetch options');
+  }
+  return response.links;
+};
+
+const selectIncluded = (response, type) => {
+  if (!response) {
+    throw new Error('included() requires an MBTA response as an argument');
+  }
+  if (!response.included) {
+    console.warn('response.included does not exist, "include" must be in fetch options');
+    return [];
+  }
+  return response.included.filter(inc => {
+    if (Array.isArray(type)) {
+      return type.includes(inc.type);
+    }
+    return type === inc.type || type == null;
+  });
+};
+
+const selectPage = (page, response) => selectLinks(response)[page];
+
+const selectArrivalISOs = selectAttribute(Attributes.arrival_time);
+const selectDepartureISOs = selectAttribute(Attributes.departure_time);
+
+module.exports = {
+  selectPage,
+  selectIncluded,
+  selectArrivalISOs,
+  selectDepartureISOs,
+};
+
+
+/***/ }),
+
+/***/ "./lib/utils.js":
+/*!**********************!*\
+  !*** ./lib/utils.js ***!
+  \**********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+const { selectArrivalISOs, selectDepartureISOs } = __webpack_require__(/*! ./selectors */ "./lib/selectors.js");
+
+const exists = value => value != null && value !== '';
+
+const isEmptyArray = array => Array.isArray(array) && !array.filter(Boolean).length;
 
 /* eslint-disable camelcase */
 const BASE_URL = 'https://api-v3.mbta.com';
 
-// Creates a comma separated string of multiple values,
-// or just return a single value, whether or not it's in an array
+// CONVERSION FUNCTIONS
+
+/**
+ * Converts array or string into comma separated string
+ * @param {string | Array} value
+ */
 const commaSeparate = value => []
   .concat(value)
   .filter(Boolean)
   .join(',')
   .replace(/\s/g, '');
 
-// This handles input as a Date(), number, or
-// string, and throw if the string is malformed.
+/**
+ * Convert MS to given time units
+ * @param {number} ms
+ * @param {string} convertTo Time unit to convert MS to
+ */
+const convertMs = (ms, convertTo) => {
+  if (!exists(convertTo)) return ms;
+
+  const conversionMap = {
+    // Order here is important, because 'sec' input will
+    // match 'milliseconds' if it's before 'seconds'
+    'hours|hrs': 1000 * 60 * 60,
+    'minutes|mins': 1000 * 60,
+    'seconds|secs': 1000,
+    'ms|milliseconds': 1,
+  };
+
+  const converted = Object.keys(conversionMap).find(unit => new RegExp(convertTo, 'i').test(unit));
+
+  if (!exists(converted)) {
+    throw new Error(`Invalid 'convertTo' value: ${convertTo}`);
+  }
+
+  return ms / conversionMap[converted];
+};
+
+/**
+ * Convert an array of ISO strings to <units> from now
+ * @param {function} selector Select array of ISO times from response object
+ */
+const convertTimes = selector => options => {
+  const { response, max, convertTo, now = Date.now() } = options;
+
+  return selector(response)
+    .slice(0, max)
+    .map(isoString => {
+      // Note: arrival could be null if first stop on a route. Use departures
+      // if it's not null. Departure could be null if final stop on a route
+      // See https://www.mbta.com/developers/v3-api/best-practices for more info
+      if (convertTo == null || isoString == null) return isoString;
+
+      const msFromNow = new Date(isoString).valueOf() - now;
+      const unitsFromNow = Math.floor(convertMs(msFromNow, convertTo));
+
+      return unitsFromNow >= 0 ? unitsFromNow : 0;
+    });
+};
+
+const arrivalsWithConversion = convertTimes(selectArrivalISOs);
+const departuresWithConversion = convertTimes(selectDepartureISOs);
+
+// NORMALIZATION FUNCTIONS
+
+/**
+ * Takes any kind of input, returns an ISO string.
+ * Throws if input is malformed.
+ * @param {number | string | Date} value
+ */
 const normalizeDate = value => new Date(value).toISOString();
 
-// Handles number or string input and returns numeric type based on:
-// https://developers.google.com/transit/gtfs/reference/routes-file
+/**
+ * Handles number or string input and returns numeric type based on:
+ * https://developers.google.com/transit/gtfs/reference/routes-file
+ * @param {string} type
+ */
 const normalizeType = type => {
   const typeNames = [
     'tram|light rail|streetcar|trolley',
@@ -389,6 +488,12 @@ const normalizeType = type => {
   return normalized > -1 ? normalized : null;
 };
 
+/**
+ * URL construction function
+ * @param {string} endpoint
+ * @param {object} queryParams Specific to each endpoint
+ * @param {string} apiKey
+ */
 function buildUrl(endpoint, queryParams, apiKey) {
   const url = BASE_URL + endpoint;
 
@@ -440,6 +545,7 @@ function buildUrl(endpoint, queryParams, apiKey) {
     }
   });
 
+  // Convert queryParams into string values for URL
   const queryString = Object.entries(queryParams)
     .map(([key, value]) => {
       let finalValue;
@@ -479,116 +585,13 @@ function buildUrl(endpoint, queryParams, apiKey) {
 }
 
 module.exports = {
+  exists,
   buildUrl,
+  convertMs,
+  convertTimes,
+  isEmptyArray,
   normalizeType,
   normalizeDate,
-};
-
-
-/***/ }),
-
-/***/ "./lib/utils.js":
-/*!**********************!*\
-  !*** ./lib/utils.js ***!
-  \**********************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-const { Attributes } = __webpack_require__(/*! ./constants */ "./lib/constants.js");
-
-const exists = value => value != null && value !== '';
-
-const isEmptyArray = array => Array.isArray(array) && !array.filter(Boolean).length;
-
-const convertMs = (ms, convertTo) => {
-  if (!exists(convertTo)) return ms;
-
-  const conversionMap = {
-    // Order here is important, because 'sec' input will
-    // match 'milliseconds' if it's before 'seconds'
-    'hours|hrs': 1000 * 60 * 60,
-    'minutes|mins': 1000 * 60,
-    'seconds|secs': 1000,
-    'ms|milliseconds': 1,
-  };
-
-  const converted = Object.keys(conversionMap).find(unit => new RegExp(convertTo, 'i').test(unit));
-
-  if (!exists(converted)) {
-    throw new Error(`Invalid 'convertTo' value: ${convertTo}`);
-  }
-
-  return ms / conversionMap[converted];
-};
-
-const convertTimes = selector => options => {
-  const { response, max, convertTo, now = Date.now() } = options;
-
-  return selector(response)
-    .slice(0, max)
-    .map(isoString => {
-      // Note: arrival could be null if first stop on a route. Use departures
-      // if it's not null. Departure could be null if final stop on a route
-      // See https://www.mbta.com/developers/v3-api/best-practices for more info
-      if (convertTo == null || isoString == null) return isoString;
-
-      const msFromNow = new Date(isoString).valueOf() - now;
-      const unitsFromNow = Math.floor(convertMs(msFromNow, convertTo));
-
-      return unitsFromNow >= 0 ? unitsFromNow : 0;
-    });
-};
-
-const selectAttribute = attr => response => {
-  if (!response || !response.data) {
-    console.warn('No response data...');
-    return [];
-  }
-
-  return response.data.map(vehicle => vehicle.attributes[attr]);
-};
-
-const selectLinks = response => {
-  if (!response) {
-    throw new Error('No response, fetch data before accessing this value');
-  }
-  if (!response.links) {
-    console.warn('response.links does not exist, "limit" must be in fetch options');
-  }
-  return response.links;
-};
-
-const selectIncluded = (response, type) => {
-  if (!response) {
-    throw new Error('included() requires an MBTA response as an argument');
-  }
-  if (!response.included) {
-    console.warn('response.included does not exist, "include" must be in fetch options');
-    return [];
-  }
-  return response.included.filter(inc => {
-    if (Array.isArray(type)) {
-      return type.includes(inc.type);
-    }
-    return type === inc.type || type == null;
-  });
-};
-
-const selectPage = (page, response) => selectLinks(response)[page];
-
-const selectArrivalISOs = selectAttribute(Attributes.arrival_time);
-const selectDepartureISOs = selectAttribute(Attributes.departure_time);
-
-const arrivalsWithConversion = convertTimes(selectArrivalISOs);
-const departuresWithConversion = convertTimes(selectDepartureISOs);
-
-module.exports = {
-  exists,
-  isEmptyArray,
-  convertMs,
-  selectPage,
-  convertTimes,
-  selectIncluded,
   arrivalsWithConversion,
   departuresWithConversion,
 };

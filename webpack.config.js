@@ -2,7 +2,7 @@
 
 function generateConfig(name) {
   const config = {
-    entry: './lib/index.js',
+    entry: './index.js',
     output: {
       path: `${__dirname}/dist/`,
       filename: `${name}.js`,
