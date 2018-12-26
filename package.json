@@ -30,6 +30,11 @@
     "/lib"
   ],
   "homepage": "https://github.com/helloitsjoe/mbta-client#readme",
+  "husky": {
+    "hooks": {
+      "pre-push": "npm t; npm run build"
+    }
+  },
   "dependencies": {
     "axios": "^0.18.0"
   },
@@ -40,6 +45,7 @@
     "eslint-plugin-jsx-a11y": "^6.1.2",
     "eslint-plugin-react": "^7.11.1",
     "eslint-plugin-standard": "^4.0.0",
+    "husky": "^1.2.1",
     "jest": "^23.6.0",
     "prettier": "^1.15.3",
     "webpack": "^4.28.2",
