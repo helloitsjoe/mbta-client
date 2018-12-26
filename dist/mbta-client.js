@@ -142,12 +142,11 @@ module.exports = {
 
 const axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 
-const fetchService = async url => {
+const fetchService = async (url, service = axios) => {
   try {
-    const res = await axios.get(url);
+    const res = await service.get(url);
     if (!res || !res.data) {
-      const err = { message: 'No data from MBTA' };
-      throw new Error(err);
+      throw new Error('No data from MBTA');
     }
     return res.data;
   } catch (err) {
@@ -157,6 +156,7 @@ const fetchService = async url => {
       console.error(
         `Error ${error.status || error.code} fetching MBTA data: ${error.detail || '(no details)'}`
       );
+      throw error;
     } else {
       console.error('Error fetching MBTA data:', err.message);
     }
@@ -332,7 +332,7 @@ const selectLinks = response => {
     throw new Error('No response, fetch data before accessing this value');
   }
   if (!response.links) {
-    console.warn('response.links does not exist, "limit" must be in fetch options');
+    throw new Error('response.links does not exist, "limit" must be in fetch options');
   }
   return response.links;
 };
@@ -488,6 +488,15 @@ const normalizeType = type => {
   return normalized > -1 ? normalized : null;
 };
 
+const addApiKey = (url, apiKey) => {
+  if (!exists(apiKey)) {
+    console.warn('API key is missing. Keys available at https://api-v3.mbta.com');
+    return `${url}`;
+  }
+  const delimiter = url.includes('?') ? '&' : '?';
+  return `${url}${delimiter}api_key=${apiKey}`;
+};
+
 /**
  * URL construction function
  * @param {string} endpoint
@@ -498,7 +507,7 @@ function buildUrl(endpoint, queryParams, apiKey) {
   const url = BASE_URL + endpoint;
 
   if (!queryParams || !Object.keys(queryParams).length) {
-    return url;
+    return addApiKey(url, apiKey);
   }
 
   const {
@@ -576,12 +585,7 @@ function buildUrl(endpoint, queryParams, apiKey) {
     .filter(Boolean)
     .join('&');
 
-  if (!exists(apiKey)) {
-    console.warn('API key is missing. Keys available at https://api-v3.mbta.com');
-    return `${url}?${queryString}`;
-  }
-
-  return `${url}?${queryString}&api_key=${apiKey}`;
+  return addApiKey(`${url}?${queryString}`, apiKey);
 }
 
 module.exports = {
