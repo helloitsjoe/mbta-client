@@ -10,7 +10,7 @@ npm i mbta-client
 
 ## Basic Usage
 
-### Fetch functions:
+### Fetch functions
 
 ```js
 import MBTA from 'mbta-client';
@@ -58,14 +58,14 @@ const sorted = mbta.fetchPredictions({
 
 #### Arrivals/Departures
 
+_Note: arrival and departure helpers have the same API/options._
+
 ```js
 // By default, returns an array of arrival times in ISO8601 format
 const arr = mbta.selectArrivals(response);
 // `convertTo` returns time left in ms, seconds, minutes, hours
 const dep = mbta.selectDepartures(response, { convertTo: 'minutes' });
 ```
-
-_Note: arrival and departure helpers have the same API/options._
 
 #### Pagination
 
@@ -86,7 +86,7 @@ const lastPageResults = await mbta.getLastPage(results);
 
 ## API
 
-### Fetch functions:
+### Fetch functions
 
 (These return a promise that resolves to an MBTA response object)
 
@@ -105,7 +105,7 @@ mbta.fetchPredictions(options);
 // mbta.fetchAlerts(options) COMING SOON
 ```
 
-### Helper functions:
+### Helper functions
 
 ```ts
 mbta.selectArrivals(response: MBTAResponse, options?: TimeOptions);
@@ -124,7 +124,7 @@ mbta.selectIncluded(response: MBTAResponse, options?: TypeOptions);
 type TypeOptions = { type?: include_value | include_value[] };
 ```
 
-## Pagination helpers:
+### Pagination helpers
 
 (These return a promise that resolves to an MBTA response object)
 
