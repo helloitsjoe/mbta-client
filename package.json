@@ -4,7 +4,7 @@
   "description": "MBTA API v3 Node.js Client Library",
   "main": "index.js",
   "scripts": {
-    "test": "jest --testPathPattern=__tests__/index.test.js",
+    "test": "jest --coverage --testPathPattern=__tests__/index.test.js",
     "lint": "eslint --fix-dry-run",
     "watch": "webpack --watch",
     "build": "webpack"
@@ -34,7 +34,7 @@
   "homepage": "https://github.com/helloitsjoe/mbta-client#readme",
   "husky": {
     "hooks": {
-      "pre-push": "npm t --coverage && npm run build"
+      "pre-push": "npm t && npm run build"
     }
   },
   "dependencies": {
