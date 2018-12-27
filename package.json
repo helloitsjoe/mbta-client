@@ -34,7 +34,7 @@
   "homepage": "https://github.com/helloitsjoe/mbta-client#readme",
   "husky": {
     "hooks": {
-      "pre-push": "npm t && npm run build"
+      "pre-push": "npm t --coverage && npm run build"
     }
   },
   "dependencies": {
