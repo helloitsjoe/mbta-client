@@ -135,6 +135,8 @@ MBTA API Documentation: https://api-v3.mbta.com/docs/swagger/index.html
 
 MBTA API Best Practices: https://www.mbta.com/developers/v3-api/best-practices
 
+_Note: This library is not affiliated with the MBTA or MassDOT._
+
 ## License
 
 MIT
