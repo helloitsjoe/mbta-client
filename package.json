@@ -29,7 +29,8 @@
   },
   "files": [
     "/dist",
-    "/lib"
+    "/lib",
+    "!__tests__"
   ],
   "homepage": "https://github.com/helloitsjoe/mbta-client#readme",
   "husky": {
