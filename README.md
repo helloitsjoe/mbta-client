@@ -96,8 +96,10 @@ mbta.fetchServices(options);
 mbta.fetchSchedules(options);
 mbta.fetchFacilities(options);
 mbta.fetchPredictions(options);
-// mbta.fetchAlerts(options) COMING SOON
+mbta.fetchAlerts(options); // See note on alerts below
 ```
+
+The MBTA docs say: "Displaying alerts is one of the trickiest features to get correct." See their [best practices](https://www.mbta.com/developers/v3-api/best-practices) and the [alerts API docs](https://api-v3.mbta.com/docs/swagger/index.html#/Alert/ApiWeb_AlertController_index) for more information.
 
 ### Helper functions
 
