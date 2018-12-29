@@ -35,7 +35,7 @@
   "husky": {
     "hooks": {
       "pre-commit": "npm run build",
-      "pre-push": "npm t"
+      "pre-push": "npm t -- --silent"
     }
   },
   "dependencies": {
