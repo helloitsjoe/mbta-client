@@ -41,10 +41,18 @@ const local = await mbta.fetchStops({ latitude: 42.373, longitude: -71.119 });
 
 // Sort by `arrival_time`, `departure_time`, etc. See MBTA docs for each
 // endpoint's sort options. `descending: true` will reverse sort order.
-const sorted = mbta.fetchPredictions({
+const sorted = await mbta.fetchPredictions({
   stop: 42,
   sort: 'arrival_time',
   descending: true,
+});
+
+// Alerts have a number of extra filters. See MBTA docs for best practices.
+const alerts = await mbta.fetchAlerts({
+  sort: 'cause',
+  activity: 'BOARD',
+  datetime: 'NOW',
+  severity: [2, 3],
 });
 ```
 
@@ -84,7 +92,7 @@ const lastPageResults = await mbta.getLastPage(results);
 
 (These return a promise that resolves to an MBTA response object)
 
-These map to the endpoints listed at https://api-v3.mbta.com/docs/swagger/index.html. They return a promise that resolves to an MBTA response object. `options` for each function maps to the filters listed on that page. `options` that accept multiple values can be provided as an array or comma separated string.
+These map to the endpoints listed in [the MBTA docs](https://api-v3.mbta.com/docs/swagger/index.html). They return a promise that resolves to an MBTA response object. `options` for each function maps to the filters listed on that page. `options` that accept multiple values can be provided as an array or comma separated string.
 
 ```js
 mbta.fetchStops(options);
@@ -96,6 +104,7 @@ mbta.fetchServices(options);
 mbta.fetchSchedules(options);
 mbta.fetchFacilities(options);
 mbta.fetchPredictions(options);
+
 mbta.fetchAlerts(options); // See note on alerts below
 ```
 
@@ -110,15 +119,15 @@ mbta.selectDepartures(response: MBTAResponse, options?: TimeOptions);
 type TimeOptions = { convertTo?: 'ms' | 'seconds' | 'minutes' | 'hours' };
 ```
 
-_Note: `arrival_time` could be null if it's the first stop on a route. If `departure_time` is not null, the MBTA recommends using that instead. Departure could be null if it's the final stop on a route. See https://www.mbta.com/developers/v3-api/best-practices for more info._
+_Note: `arrival_time` could be null if it's the first stop on a route. If `departure_time` is not null, the MBTA recommends using that instead. Departure could be null if it's the final stop on a route. See [best practices](https://www.mbta.com/developers/v3-api/best-practices) for more info._
 
 ```ts
 mbta.selectIncluded(response: MBTAResponse, options?: TypeOptions);
 
-// See the MBTA API docs for `include_value` options for each endpoint
-// https://api-v3.mbta.com/docs/swagger/index.html
 type TypeOptions = { type?: include_value | include_value[] };
 ```
+
+_See the [MBTA API docs](https://api-v3.mbta.com/docs/swagger/index.html) for `include_value` options for each endpoint_
 
 ### Pagination helpers
 
