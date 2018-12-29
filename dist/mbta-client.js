@@ -234,6 +234,10 @@ class MBTA {
     return this.fetch(buildUrl('/facilities', queryParams, this.apiKey));
   }
 
+  async fetchAlerts(queryParams) {
+    return this.fetch(buildUrl('/alerts', queryParams, this.apiKey));
+  }
+
   // async fetchAllRoutesBasic({ type } = {}) {
   //   const routes = await this.fetchRoutes({ type });
   //   return routes.data.map(ea => ({
