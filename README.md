@@ -77,13 +77,13 @@ Helper functions fetch the first, next, previous and last pages.
 // For paginated results, provide `limit` and optional `offset`
 const results = await mbta.fetchPredictions({ stop: 42, limit: 2 });
 
-// Use the result to get the next page
-const secondPageResults = await mbta.getNextPage(results);
-// Use the next page result to get the page after that
-const thirdPageResults = await mbta.getNextPage(secondPageResults);
-// Get first or last page from any result
-const firstPageResults = await mbta.getFirstPage(results);
-const lastPageResults = await mbta.getLastPage(results);
+// Use the result to fetch the next page
+const secondPageResults = await mbta.fetchNextPage(results);
+// Use the next page result to fetch the page after that
+const thirdPageResults = await mbta.fetchNextPage(secondPageResults);
+// Fetch first or last page from any result
+const firstPageResults = await mbta.fetchFirstPage(results);
+const lastPageResults = await mbta.fetchLastPage(results);
 ```
 
 ## API
