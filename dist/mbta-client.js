@@ -177,7 +177,11 @@ module.exports = fetchService;
 /***/ (function(module, exports, __webpack_require__) {
 
 /* eslint-disable camelcase */
-const { buildUrl, arrivalsWithConversion, departuresWithConversion } = __webpack_require__(/*! ./utils */ "./lib/utils.js");
+const {
+  buildUrl,
+  arrivalsWithConversion,
+  departuresWithConversion,
+} = __webpack_require__(/*! ./utils */ "./lib/utils.js");
 const { selectPage, selectIncluded } = __webpack_require__(/*! ./selectors */ "./lib/selectors.js");
 const fetchService = __webpack_require__(/*! ./fetchService */ "./lib/fetchService.js");
 const { Pagination } = __webpack_require__(/*! ./constants */ "./lib/constants.js");
@@ -234,46 +238,41 @@ class MBTA {
     return this.fetch(buildUrl('/facilities', queryParams, this.apiKey));
   }
 
+  async fetchLiveFacilities(queryParams) {
+    return this.fetch(buildUrl('/live-facilities', queryParams, this.apiKey));
+  }
+
   async fetchAlerts(queryParams) {
     return this.fetch(buildUrl('/alerts', queryParams, this.apiKey));
   }
 
-  /**
-   * Fetch helper functions
-   */
-  async fetchAllRoutesBasic(filters) {
-    // Example: filter by { type: 3 } to get all bus routes
-    const routes = await this.fetchRoutes(filters);
-    return routes.data.map(route => {
-      const { short_name } = route.attributes;
-      // Only include short_name if it exists and is different from `id`
-      const maybeAbbr = short_name && short_name !== route.id ? { short_name } : {};
-      return {
-        ...maybeAbbr,
-        id: route.id,
-        long_name: route.attributes.long_name,
-        direction_names: route.attributes.direction_names,
-      };
-    });
-  }
+  // async fetchAllRoutesBasic({ type } = {}) {
+  //   const routes = await this.fetchRoutes({ type });
+  //   return routes.data.map(ea => ({
+  //     id: ea.id,
+  //     abbr: ea.attributes.short_name,
+  //     name: ea.attributes.long_name,
+  //     directions: ea.attributes.direction_names,
+  //   }));
+  // }
 
-  async fetchStopIdsByRoute(route) {
-    const stops = await this.fetchStops({ route });
-    return stops.data.map(stop => ({
-      name: stop.attributes.name,
-      id: stop.id,
-    }));
-  }
+  // async fetchAllStopsByRoute(route) {
+  //   const stops = await this.fetchStops({ route });
+  //   return stops.data.map(stop => ({
+  //     name: stop.attributes.name,
+  //     id: stop.id,
+  //   }));
+  // }
 
-  async fetchStopByName(name, { exact } = {}) {
-    const allStops = await this.fetchStops();
-    return allStops.data.filter(stop => {
-      if (exact) {
-        return stop.attributes.name === name;
-      }
-      return stop.attributes.name.match(name);
-    });
-  }
+  // async fetchStopByName(name, { exact } = {}) {
+  //   const allStops = await this.fetchStops();
+  //   return allStops.data.filter(stop => {
+  //     if (exact) {
+  //       return stop.attributes.name === name;
+  //     }
+  //     return stop.attributes.name.match(name);
+  //   });
+  // }
 
   /**
    * Select arrival/departure times from predictions with options to limit
