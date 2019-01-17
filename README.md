@@ -69,6 +69,24 @@ const arr = mbta.selectArrivals(response);
 const dep = mbta.selectDepartures(response, { convertTo: 'minutes' });
 ```
 
+#### Fetch Helpers
+
+```js
+// Returns basic info for all routes: name, ID, direction names.
+// Useful when you need params for `fetchPredictions`, etc.
+const allRouteInfo = await mbta.fetchAllRoutes();
+console.log(allRouteInfo);
+
+// Returns all stop IDs for the provided route. Also useful for params.
+const redLineStops = await mbta.fetchStopsByRoute('Red');
+console.log(redLineStops);
+
+// Returns full MBTA response for stops with the provided string in the name.
+// Optional param `{ exact: true }` returns only exact matches for the name.
+const harvardStops = await mbta.fetchStopsByName('Harvard', { exact: true });
+console.log(harvardStops);
+```
+
 #### Pagination
 
 Helper functions fetch the first, next, previous and last pages.
@@ -95,17 +113,18 @@ const lastPageResults = await mbta.fetchLastPage(results);
 These map to the endpoints listed in [the MBTA docs](https://api-v3.mbta.com/docs/swagger/index.html). They return a promise that resolves to an MBTA response object. `options` for each function maps to the filters listed on that page. `options` that accept multiple values can be provided as an array or comma separated string.
 
 ```js
-mbta.fetchStops(options);
-mbta.fetchTrips(options);
-mbta.fetchRoutes(options);
-mbta.fetchShapes(options);
-mbta.fetchVehicles(options);
-mbta.fetchServices(options);
-mbta.fetchSchedules(options);
-mbta.fetchFacilities(options);
-mbta.fetchPredictions(options);
+mbta.fetchStops(options): Promise<MBTAResponse>;
+mbta.fetchTrips(options): Promise<MBTAResponse>;
+mbta.fetchRoutes(options): Promise<MBTAResponse>;
+mbta.fetchShapes(options): Promise<MBTAResponse>;
+mbta.fetchVehicles(options): Promise<MBTAResponse>;
+mbta.fetchServices(options): Promise<MBTAResponse>;
+mbta.fetchSchedules(options): Promise<MBTAResponse>;
+mbta.fetchFacilities(options): Promise<MBTAResponse>;
+mbta.fetchPredictions(options): Promise<MBTAResponse>;
+mbta.fetchLiveFacilities(options): Promise<MBTAResponse>;
 
-mbta.fetchAlerts(options); // See note on alerts below
+mbta.fetchAlerts(options): Promise<MBTAResponse>; // See note on alerts below
 ```
 
 The MBTA docs say: "Displaying alerts is one of the trickiest features to get correct." See their [best practices](https://www.mbta.com/developers/v3-api/best-practices) and the [alerts API docs](https://api-v3.mbta.com/docs/swagger/index.html#/Alert/ApiWeb_AlertController_index) for more information.
@@ -122,9 +141,21 @@ type TimeOptions = { convertTo?: 'ms' | 'seconds' | 'minutes' | 'hours' };
 _Note: `arrival_time` could be null if it's the first stop on a route. If `departure_time` is not null, the MBTA recommends using that instead. Departure could be null if it's the final stop on a route. See [best practices](https://www.mbta.com/developers/v3-api/best-practices) for more info._
 
 ```ts
+mbta.fetchAllRoutes(filters?: TypeOptions): Promise<BasicRouteResponse>;
+mbta.fetchStopsByRoute(routeID: string|number): Promise<StopsByRouteResponse>;
+mbta.fetchStopsByName(name: string, opts: NameOptions): Promise<MBTAResponse>;
+
 mbta.selectIncluded(response: MBTAResponse, options?: TypeOptions);
 
+type BasicRouteResponse = {
+  id: string,
+  long_name: string,
+  direction_names: string[],
+  short_name?: string
+};
+type StopsByRouteResponse = { name: string, id: string };
 type TypeOptions = { type?: include_value | include_value[] };
+type NameOptions = { exact: boolean };
 ```
 
 _See the [MBTA API docs](https://api-v3.mbta.com/docs/swagger/index.html) for `include_value` options for each endpoint_
