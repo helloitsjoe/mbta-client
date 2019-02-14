@@ -108,23 +108,21 @@ const lastPageResults = await mbta.fetchLastPage(results);
 
 ### Fetch functions
 
-(These return a promise that resolves to an MBTA response object)
-
 These map to the endpoints listed in [the MBTA docs](https://api-v3.mbta.com/docs/swagger/index.html). They return a promise that resolves to an MBTA response object. `options` for each function maps to the filters listed on that page. `options` that accept multiple values can be provided as an array or comma separated string.
 
 ```js
-mbta.fetchStops(options): Promise<MBTAResponse>;
-mbta.fetchTrips(options): Promise<MBTAResponse>;
-mbta.fetchRoutes(options): Promise<MBTAResponse>;
-mbta.fetchShapes(options): Promise<MBTAResponse>;
-mbta.fetchVehicles(options): Promise<MBTAResponse>;
-mbta.fetchServices(options): Promise<MBTAResponse>;
-mbta.fetchSchedules(options): Promise<MBTAResponse>;
-mbta.fetchFacilities(options): Promise<MBTAResponse>;
-mbta.fetchPredictions(options): Promise<MBTAResponse>;
-mbta.fetchLiveFacilities(options): Promise<MBTAResponse>;
+mbta.fetchStops(options);
+mbta.fetchTrips(options);
+mbta.fetchRoutes(options);
+mbta.fetchShapes(options);
+mbta.fetchVehicles(options);
+mbta.fetchServices(options);
+mbta.fetchSchedules(options);
+mbta.fetchFacilities(options);
+mbta.fetchPredictions(options);
+mbta.fetchLiveFacilities(options);
 
-mbta.fetchAlerts(options): Promise<MBTAResponse>; // See note on alerts below
+mbta.fetchAlerts(options); // See note on alerts below
 ```
 
 The MBTA docs say: "Displaying alerts is one of the trickiest features to get correct." See their [best practices](https://www.mbta.com/developers/v3-api/best-practices) and the [alerts API docs](https://api-v3.mbta.com/docs/swagger/index.html#/Alert/ApiWeb_AlertController_index) for more information.
