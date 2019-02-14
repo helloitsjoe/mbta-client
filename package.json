@@ -1,6 +1,6 @@
 {
   "name": "mbta-client",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "MBTA API v3 Node.js Client Library",
   "main": "index.js",
   "scripts": {
