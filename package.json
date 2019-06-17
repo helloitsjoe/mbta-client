@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --coverage --testPathPattern=__tests__/index.test.js",
-    "coveralls": "npm t -- --reporter=text-lcov | coveralls",
+    "coveralls": "cat ./coverage/lcov.info | coveralls",
     "lint": "eslint --fix-dry-run",
     "watch": "webpack --watch",
     "build": "webpack"
