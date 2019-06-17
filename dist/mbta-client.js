@@ -400,10 +400,12 @@ module.exports = {
 /***/ (function(module, exports, __webpack_require__) {
 
 const { selectArrivalISOs, selectDepartureISOs } = __webpack_require__(/*! ./selectors */ "./lib/selectors.js");
+const isoRegex = /(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}).000Z/;
 
 const exists = value => value != null && value !== '';
 
-const isEmptyArray = array => Array.isArray(array) && !array.filter(Boolean).length;
+const isEmptyArray = array =>
+  Array.isArray(array) && !array.filter(Boolean).length;
 
 /* eslint-disable camelcase */
 const BASE_URL = 'https://api-v3.mbta.com';
@@ -414,11 +416,12 @@ const BASE_URL = 'https://api-v3.mbta.com';
  * Converts array or string into comma separated string
  * @param {string | Array} value
  */
-const commaSeparate = value => []
-  .concat(value)
-  .filter(Boolean)
-  .join(',')
-  .replace(/,\s/g, ',');
+const commaSeparate = value =>
+  []
+    .concat(value)
+    .filter(Boolean)
+    .join(',')
+    .replace(/,\s/g, ',');
 
 /**
  * Convert MS to given time units
@@ -437,7 +440,9 @@ const convertMs = (ms, convertTo) => {
     'ms|milliseconds': 1,
   };
 
-  const converted = Object.keys(conversionMap).find(unit => new RegExp(convertTo, 'i').test(unit));
+  const converted = Object.keys(conversionMap).find(unit =>
+    new RegExp(convertTo, 'i').test(unit)
+  );
 
   if (!exists(converted)) {
     throw new Error(`Invalid 'convertTo' value: ${convertTo}`);
@@ -508,13 +513,17 @@ const normalizeType = type => {
   if (typeAsNum === typeAsNum) {
     return typeAsNum;
   }
-  const normalized = typeNames.findIndex(name => new RegExp(type, 'i').test(name));
+  const normalized = typeNames.findIndex(name =>
+    new RegExp(type, 'i').test(name)
+  );
   return normalized > -1 ? normalized : null;
 };
 
 const addApiKey = (url, apiKey) => {
   if (!exists(apiKey)) {
-    console.warn('API key is missing. Keys available at https://api-v3.mbta.com');
+    console.warn(
+      'API key is missing. Keys available at https://api-v3.mbta.com'
+    );
     return `${url}`;
   }
   const delimiter = url.includes('?') ? '&' : '?';
@@ -558,8 +567,8 @@ function buildUrl(endpoint, queryParams, apiKey) {
   const matchRoute = test => test === endpoint;
 
   if (
-    (matchRoute('/predictions') || matchRoute('/schedules'))
-    && (!exists(stop) && !exists(trip) && !exists(route))
+    (matchRoute('/predictions') || matchRoute('/schedules')) &&
+    (!exists(stop) && !exists(trip) && !exists(route))
   ) {
     console.warn('Please include "stop", "trip", or "route"');
   }
@@ -572,7 +581,10 @@ function buildUrl(endpoint, queryParams, apiKey) {
     console.warn('"offset" will have no effect without "limit"');
   }
 
-  if ((exists(latitude) && !exists(longitude)) || (!exists(latitude) && exists(longitude))) {
+  if (
+    (exists(latitude) && !exists(longitude)) ||
+    (!exists(latitude) && exists(longitude))
+  ) {
     console.warn('Latitude and longitude must both be present');
   }
 
@@ -629,6 +641,7 @@ function buildUrl(endpoint, queryParams, apiKey) {
 module.exports = {
   exists,
   buildUrl,
+  isoRegex,
   convertMs,
   convertTimes,
   isEmptyArray,

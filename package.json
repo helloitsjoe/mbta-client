@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --coverage --testPathPattern=__tests__/index.test.js",
+    "coveralls": "npm t -- --reporter=text-lcov | coveralls",
     "lint": "eslint --fix-dry-run",
     "watch": "webpack --watch",
     "build": "webpack"
@@ -43,6 +44,7 @@
     "axios": "^0.19.0"
   },
   "devDependencies": {
+    "coveralls": "^3.0.4",
     "eslint": "^5.10.0",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-plugin-jsx-a11y": "^6.1.2",

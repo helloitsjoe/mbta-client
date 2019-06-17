@@ -2,6 +2,8 @@
 
 `mbta-client` is a promise-based Node.js client library for the MTBA API v3, with a few helper functions to parse response data.
 
+[![Build Status](https://travis-ci.com/helloitsjoe/mbta-client.svg?branch=master)](https://travis-ci.com/helloitsjoe/mbta-client)
+
 ## Installation:
 
 ```js
