@@ -4,6 +4,7 @@
 
 [![Build Status](https://travis-ci.com/helloitsjoe/mbta-client.svg?branch=master)](https://travis-ci.com/helloitsjoe/mbta-client)
 [![Coverage Status](https://coveralls.io/repos/github/helloitsjoe/mbta-client/badge.svg?branch=master)](https://coveralls.io/github/helloitsjoe/mbta-client?branch=master)
+[![NPM Version](https://img.shields.io/npm/v/mbta-client.svg?color=lightgray)](https://www.npmjs.com/package/mbta-client)
 
 ## Installation:
 
