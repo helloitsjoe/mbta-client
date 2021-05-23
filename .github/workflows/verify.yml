@@ -1,0 +1,20 @@
+on:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
+      # - uses: c-hive/gha-yarn-cache@v1
+      - run: npm i
+      - run: npx helloitsjoe/release-toolkit#v1.0.0 verify
+      - run: npm run test
+      - run: npm run coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
