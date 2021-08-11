@@ -204,8 +204,44 @@ class MBTA {
   /**
    * Fetch functions
    */
+  async fetchAlerts(queryParams) {
+    return this.fetch(buildUrl('/alerts', queryParams, this.apiKey, this.logger));
+  }
+
+  async fetchFacilities(queryParams) {
+    return this.fetch(buildUrl('/facilities', queryParams, this.apiKey, this.logger));
+  }
+
+  async fetchLines(queryParams) {
+    return this.fetch(buildUrl('/lines', queryParams, this.apiKey, this.logger));
+  }
+
+  async fetchLiveFacilities(queryParams) {
+    return this.fetch(buildUrl('/live_facilities', queryParams, this.apiKey, this.logger));
+  }
+
   async fetchPredictions(queryParams) {
     return this.fetch(buildUrl('/predictions', queryParams, this.apiKey, this.logger));
+  }
+
+  async fetchRoutes(queryParams) {
+    return this.fetch(buildUrl('/routes', queryParams, this.apiKey, this.logger));
+  }
+
+  async fetchRoutePatterns(queryParams) {
+    return this.fetch(buildUrl('/route_patterns', queryParams, this.apiKey, this.logger));
+  }
+
+  async fetchSchedules(queryParams) {
+    return this.fetch(buildUrl('/schedules', queryParams, this.apiKey, this.logger));
+  }
+
+  async fetchServices(queryParams) {
+    return this.fetch(buildUrl('/services', queryParams, this.apiKey, this.logger));
+  }
+
+  async fetchShapes(queryParams) {
+    return this.fetch(buildUrl('/shapes', queryParams, this.apiKey, this.logger));
   }
 
   async fetchStops(queryParams) {
@@ -216,36 +252,8 @@ class MBTA {
     return this.fetch(buildUrl('/trips', queryParams, this.apiKey, this.logger));
   }
 
-  async fetchRoutes(queryParams) {
-    return this.fetch(buildUrl('/routes', queryParams, this.apiKey, this.logger));
-  }
-
   async fetchVehicles(queryParams) {
     return this.fetch(buildUrl('/vehicles', queryParams, this.apiKey, this.logger));
-  }
-
-  async fetchShapes(queryParams) {
-    return this.fetch(buildUrl('/shapes', queryParams, this.apiKey, this.logger));
-  }
-
-  async fetchServices(queryParams) {
-    return this.fetch(buildUrl('/services', queryParams, this.apiKey, this.logger));
-  }
-
-  async fetchSchedules(queryParams) {
-    return this.fetch(buildUrl('/schedules', queryParams, this.apiKey, this.logger));
-  }
-
-  async fetchFacilities(queryParams) {
-    return this.fetch(buildUrl('/facilities', queryParams, this.apiKey, this.logger));
-  }
-
-  async fetchLiveFacilities(queryParams) {
-    return this.fetch(buildUrl('/live-facilities', queryParams, this.apiKey, this.logger));
-  }
-
-  async fetchAlerts(queryParams) {
-    return this.fetch(buildUrl('/alerts', queryParams, this.apiKey, this.logger));
   }
 
   /**
