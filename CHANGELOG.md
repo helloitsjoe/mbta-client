@@ -1,3 +1,9 @@
+## [1.1.1](https://github.com/helloitsjoe/mbta-client/releases/tag/v1.1.1) (2021-08-10)
+
+**Chore**
+
+- Update path-parse to 1.0.7
+
 ## [1.1.0](https://github.com/helloitsjoe/mbta-client/releases/tag/v1.1.0) (2021-08-02)
 
 **Feature**
