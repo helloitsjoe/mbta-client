@@ -1,3 +1,9 @@
+## [1.1.2](https://github.com/helloitsjoe/mbta-client/releases/tag/v1.1.2) (2021-09-20)
+
+**Chore**
+
+- Update tmpl to 1.0.5
+
 ## [1.1.1](https://github.com/helloitsjoe/mbta-client/releases/tag/v1.1.1) (2021-08-10)
 
 **Chore**
