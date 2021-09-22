@@ -1,3 +1,9 @@
+## [1.1.3](https://github.com/helloitsjoe/mbta-client/releases/tag/v1.1.3) (2021-09-22)
+
+**Chore**
+
+- Bump Axios to 0.21.2
+
 ## [1.1.2](https://github.com/helloitsjoe/mbta-client/releases/tag/v1.1.2) (2021-09-20)
 
 **Chore**
