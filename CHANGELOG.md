@@ -1,3 +1,9 @@
+## [1.1.5](https://github.com/helloitsjoe/mbta-client/releases/tag/v1.1.5) (2022-01-13)
+
+**Chore**
+
+- Upgrade deps
+
 ## [1.1.4](https://github.com/helloitsjoe/mbta-client/releases/tag/v1.1.4) (2021-10-08)
 
 **Chore**
