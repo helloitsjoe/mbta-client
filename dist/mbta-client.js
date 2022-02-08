@@ -199,61 +199,25 @@ class MBTA {
     this.apiKey = apiKey;
     this.fetch = fetch;
     this.logger = logger;
+
+    this.fetchStops = this._fetch('/stops');
+    this.fetchTrips = this._fetch('/trips');
+    this.fetchLines = this._fetch('/lines');
+    this.fetchAlerts = this._fetch('/alerts');
+    this.fetchShapes = this._fetch('/shapes');
+    this.fetchRoutes = this._fetch('/routes');
+    this.fetchServices = this._fetch('/services');
+    this.fetchVehicles = this._fetch('/vehicles');
+    this.fetchSchedules = this._fetch('/schedules');
+    this.fetchFacilities = this._fetch('/facilities');
+    this.fetchPredictions = this._fetch('/predictions');
+    this.fetchRoutePatterns = this._fetch('/route_patterns');
+    this.fetchLiveFacilities = this._fetch('/live_facilities');
   }
 
-  /**
-   * Fetch functions
-   */
-  async fetchAlerts(queryParams) {
-    return this.fetch(buildUrl('/alerts', queryParams, this.apiKey, this.logger));
-  }
-
-  async fetchFacilities(queryParams) {
-    return this.fetch(buildUrl('/facilities', queryParams, this.apiKey, this.logger));
-  }
-
-  async fetchLines(queryParams) {
-    return this.fetch(buildUrl('/lines', queryParams, this.apiKey, this.logger));
-  }
-
-  async fetchLiveFacilities(queryParams) {
-    return this.fetch(buildUrl('/live_facilities', queryParams, this.apiKey, this.logger));
-  }
-
-  async fetchPredictions(queryParams) {
-    return this.fetch(buildUrl('/predictions', queryParams, this.apiKey, this.logger));
-  }
-
-  async fetchRoutePatterns(queryParams) {
-    return this.fetch(buildUrl('/route_patterns', queryParams, this.apiKey, this.logger));
-  }
-
-  async fetchRoutes(queryParams) {
-    return this.fetch(buildUrl('/routes', queryParams, this.apiKey, this.logger));
-  }
-
-  async fetchSchedules(queryParams) {
-    return this.fetch(buildUrl('/schedules', queryParams, this.apiKey, this.logger));
-  }
-
-  async fetchServices(queryParams) {
-    return this.fetch(buildUrl('/services', queryParams, this.apiKey, this.logger));
-  }
-
-  async fetchShapes(queryParams) {
-    return this.fetch(buildUrl('/shapes', queryParams, this.apiKey, this.logger));
-  }
-
-  async fetchStops(queryParams) {
-    return this.fetch(buildUrl('/stops', queryParams, this.apiKey, this.logger));
-  }
-
-  async fetchTrips(queryParams) {
-    return this.fetch(buildUrl('/trips', queryParams, this.apiKey, this.logger));
-  }
-
-  async fetchVehicles(queryParams) {
-    return this.fetch(buildUrl('/vehicles', queryParams, this.apiKey, this.logger));
+  _fetch(endpoint) {
+    return (queryParams) =>
+      this.fetch(buildUrl(endpoint, queryParams, this.apiKey, this.logger));
   }
 
   /**
@@ -262,13 +226,11 @@ class MBTA {
   async fetchAllRoutes(filters) {
     // Example: filter by { type: 3 } to get all bus routes
     const routes = await this.fetchRoutes(filters);
-    return routes.data.map(route => {
+    return routes.data.map((route) => {
       const { short_name } = route.attributes;
-      // Only include short_name if it exists and is different from `id`
-      const maybeAbbr =
-        short_name && short_name !== route.id ? { short_name } : {};
       return {
-        ...maybeAbbr,
+        // Only include short_name if it exists and is different from `id`
+        ...(short_name && short_name !== route.id ? { short_name } : {}),
         id: route.id,
         long_name: route.attributes.long_name,
         direction_names: route.attributes.direction_names,
@@ -278,7 +240,7 @@ class MBTA {
 
   async fetchStopsByRoute(route) {
     const stops = await this.fetchStops({ route });
-    return stops.data.map(stop => ({
+    return stops.data.map((stop) => ({
       name: stop.attributes.name,
       id: stop.id,
     }));
@@ -287,7 +249,7 @@ class MBTA {
   async fetchStopsByName(name, { exact } = {}) {
     const allStops = await this.fetchStops();
     const normalizedName = name.trim().toLowerCase();
-    return allStops.data.filter(stop => {
+    return allStops.data.filter((stop) => {
       if (exact) {
         return stop.attributes.name.toLowerCase() === normalizedName;
       }
