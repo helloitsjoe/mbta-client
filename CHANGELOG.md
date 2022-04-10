@@ -1,3 +1,9 @@
+## [1.1.7](https://github.com/helloitsjoe/mbta-client/releases/tag/v1.1.7) (2022-04-09)
+
+**Chore**
+
+- Upgrade dependencies
+
 ## [1.1.6](https://github.com/helloitsjoe/mbta-client/releases/tag/v1.1.6) (2022-02-07)
 
 **Chore**
