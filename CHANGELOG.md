@@ -1,3 +1,9 @@
+## [1.1.8](https://github.com/helloitsjoe/mbta-client/releases/tag/v1.1.8) (2023-02-22)
+
+**Bug fix**
+
+- Handles MBTA route types correctly
+
 ## [1.1.7](https://github.com/helloitsjoe/mbta-client/releases/tag/v1.1.7) (2022-04-09)
 
 **Chore**
