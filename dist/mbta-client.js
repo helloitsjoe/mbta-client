@@ -371,6 +371,7 @@ module.exports = {
 /***/ (function(module, exports, __webpack_require__) {
 
 /* eslint-disable function-paren-newline */
+/* eslint-disable operator-linebreak */
 /* eslint-disable camelcase */
 const { selectArrivalISOs, selectDepartureISOs } = __webpack_require__(/*! ./selectors */ "./lib/selectors.js");
 
@@ -533,10 +534,10 @@ function warnForQueryParams(endpoint, queryParams) {
   const matchRoute = (test) => test === endpoint;
 
   if (
-    (matchRoute('/predictions') || matchRoute('/schedules'))
-    && !exists(stop)
-    && !exists(trip)
-    && !exists(route)
+    (matchRoute('/predictions') || matchRoute('/schedules')) &&
+    !exists(stop) &&
+    !exists(trip) &&
+    !exists(route)
   ) {
     console.warn('Please include "stop", "trip", or "route"');
   }
@@ -550,8 +551,8 @@ function warnForQueryParams(endpoint, queryParams) {
   }
 
   if (
-    (exists(latitude) && !exists(longitude))
-    || (!exists(latitude) && exists(longitude))
+    (exists(latitude) && !exists(longitude)) ||
+    (!exists(latitude) && exists(longitude))
   ) {
     console.warn('Latitude and longitude must both be present');
   }
@@ -579,8 +580,6 @@ function warnForQueryParams(endpoint, queryParams) {
  */
 function buildUrl(endpoint, queryParams, apiKey, logger = console) {
   const url = BASE_URL + endpoint;
-  console.log('endpoint', endpoint);
-  console.log('queryParams', queryParams);
 
   if (!endpoint) {
     throw new Error(
@@ -615,7 +614,6 @@ function buildUrl(endpoint, queryParams, apiKey, logger = console) {
           finalValue = value;
       }
 
-      console.log('finalValue', isEmptyArray(finalValue));
       if (!exists(finalValue) || isEmptyArray(finalValue)) {
         return null;
       }
@@ -628,9 +626,6 @@ function buildUrl(endpoint, queryParams, apiKey, logger = console) {
     .filter((param) => !!param && !/descending/.test(param))
     .join('&');
 
-  // console.log('queryString', queryString);
-
-  // return;
   return addApiKey(`${url}?${queryString}`, apiKey, logger);
 }
 
