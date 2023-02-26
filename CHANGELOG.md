@@ -1,3 +1,9 @@
+## [1.1.10](https://github.com/helloitsjoe/mbta-client/releases/tag/v1.1.10) (2023-02-25)
+
+**Chore**
+
+- Upgrade Webpack
+
 ## [1.1.9](https://github.com/helloitsjoe/mbta-client/releases/tag/v1.1.9) (2023-02-25)
 
 **Chore**
